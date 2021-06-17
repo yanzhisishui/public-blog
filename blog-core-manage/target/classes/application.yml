@@ -1,0 +1,14 @@
+server:
+  port: 8083
+
+
+aliyun:
+  oss:
+    endpoint: oss-cn-shanghai.aliyuncs.com
+    access_key_id: LTAI4G6CpwXXzqfxMa9F4rTp
+    access_key_secret: NpzAg9tvJE7adUPrKF6Y2qGaErROFH
+    buck_name: sunyuchao-blog-file
+    url_prefix: https://sunyuchao-blog-file.oss-cn-hangzhou.aliyuncs.com/
+spring:
+  profiles:
+    active: prd

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加</title>
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+</head>
+<body>
+<form class="layui-form" style="margin-top: 50px;">
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-inline">
+            <input type="text" name="title" required lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-inline">
+            <input type="text" name="description" required lay-verify="required" placeholder="请输入描述" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">图标</label>
+        <div class="layui-input-inline">
+            <input type="text" name="icon" required lay-verify="required" placeholder="请输入图标" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="checkbox" lay-skin="switch" lay-filter="switchTest" lay-text="启用|禁用">
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-inline">
+            <input type="number" name="sort" value="0" placeholder="请输入排序" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">跳转地址</label>
+        <div class="layui-input-inline">
+            <input type="text" name="url" required lay-verify="required" placeholder="请输入跳转地址" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['layer','form',],function () {
+        var layer = layui.layer,
+            form = layui.form,
+            $ = layui.jquery;
+        //监听禁用开关
+        var status=0;
+        form.on('switch(switchTest)', function(data){
+            status = this.checked ? 1 : 0;
+        });
+        form.on('submit(go)',function (data) {
+            var title = data.field.title;
+          /*  if(title.length > 7){
+                layer.msg("标题不允许大于7个字符");
+                return false;
+            }*/
+            data.field.status = status;
+            $.ajax({
+                url:"/onlineutils/save",
+                type:"POST",
+                data:data.field,
+                success:function (e) {
+                    if(e.success){
+                        window.parent.location.href='/onlineutils/manage'
+                    }
+                },
+                dataType:"json"
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

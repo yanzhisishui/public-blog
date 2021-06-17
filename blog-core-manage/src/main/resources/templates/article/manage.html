@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>技能</title>
+    <link th:href="@{/layui/css/layui.css}" href="../../../static/layui/css/layui.css" rel="stylesheet"/>
+</head>
+<body>
+
+<table class="layui-hide" id="articleTable" lay-filter="articleTable"></table>
+
+<script type="text/html" id="topBar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-normal" lay-event="add">添加</button>
+        <button class="layui-btn layui-btn-normal" lay-event="init">重新初始化ES</button>
+        <button class="layui-btn layui-btn-normal" lay-event="recommendList">推荐列表</button>
+    </div>
+    <div style="margin-top: 20px;">
+        搜索文章标题：
+        <div class="layui-inline">
+            <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+        </div>
+        <button class="layui-btn layui-btn-normal" lay-event="search">搜索</button>
+    </div>
+</script>
+
+<script type="text/html" id="rightBar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="recommend">推荐</a>
+</script>
+
+
+<script  th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['table','layer'], function(){
+        var table = layui.table,
+            $=layui.jquery,
+            layer=layui.layer;
+
+
+        table.render({
+            elem: '#articleTable'
+            ,url:'/article/queryListPage'
+            ,toolbar: '#topBar'
+            ,cols: [  [
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id', title:'ID', width:80}
+                ,{field:'title', title:'标题', width:220,templet:function (d) {
+                        return "<a href=http://'"+d.id+"'>"+d.title+"</a>";
+                    }}
+                ,{field:'classifyName', title:'分类', width:120}
+                ,{field:'bread', title:'面包屑', width:220}
+                ,{field:'browser', title:'浏览量', width:120}
+                ,{field:'collectionCount', title:'收藏量', width:120}
+                ,{field:'commentCount', title:'评论量', width:120}
+                ,{field:'username', title:'发布者', width:120,templet:function (d) {
+                        return "孙玉超";
+                    }
+                    }
+                ,{field:'imageUrl', title:'封面图地址', width:220}
+                ,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:250}
+            ]  ]
+            ,page: true
+        });
+
+
+        //头工具栏事件
+        table.on('toolbar(articleTable)', function(obj){
+
+            switch(obj.event){
+                case 'add':
+                    var open = layer.open({
+                        type: 2,
+                        area:['80%','90%'],
+                        title: "新增文章",
+                        content: '/article/add',
+                        closeBtn:0
+                    });
+                    break;
+                case 'init':  //重新初始化ES文章列表
+                    window.location.href='/article/initializeESArticle'
+                    break;
+                case 'recommendList':
+                   layer.open({
+                        type: 2,
+                        area:['50%','80%'],
+                        title: "推荐文章列表",
+                        content: '/article/recommend/manage',
+                    });
+                    break;
+                case 'search':
+                    table.render({
+                        elem: '#articleTable'
+                        ,url:'/article/queryListPage'
+                        ,toolbar: '#topBar'
+                        ,cols: [  [
+                            {type: 'checkbox', fixed: 'left'}
+                            ,{field:'id', title:'ID', width:80}
+                            ,{field:'title', title:'标题', width:220,templet:function (d) {
+                                    return "<a href=http://'"+d.id+"'>"+d.title+"</a>";
+                                }}
+                            ,{field:'classifyName', title:'分类', width:120}
+                            ,{field:'bread', title:'面包屑', width:220}
+                            ,{field:'browser', title:'浏览量', width:120}
+                            ,{field:'collectionCount', title:'收藏量', width:120}
+                            ,{field:'commentCount', title:'评论量', width:120}
+                            ,{field:'username', title:'发布者', width:120,templet:function (d) {
+                                    return "孙玉超";
+                                }
+                            }
+                            ,{field:'imageUrl', title:'封面图地址', width:220}
+                            ,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:250}
+                        ]  ]
+                        ,page: true
+                        ,where: {title:$('#demoReload').val()}
+                    });
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(articleTable)', function(obj){
+            var data = obj.data;
+            //console.log(obj)
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.ajax({
+                        url:"/article/delete",
+                        type:"POST",
+                        data:{"id":data.id},
+                        success:function (e) {
+                            if(e.success){
+                                obj.del();
+                                layer.close(index);
+                            }else{
+                                alert(e.msg);
+                            }
+                        },dataType:"json"
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                var open = layer.open({
+                    type: 2,
+                    area:['80%','90%'],
+                    title: "更新文章",
+                    content: '/article/edit?id='+data.id,
+                    closeBtn:0
+                });
+            } else if(obj.event === 'recommend'){ //添加到推荐
+                layer.confirm('将该文章添加到推荐？', function(index){
+                    $.ajax({
+                        url:"/article/recommend",
+                        type:"POST",
+                        data:{"id":data.id},
+                        success:function (e) {
+                            if(e.success){
+                                layer.msg("添加成功!");
+                                layer.close(index);
+                            }else{
+                                layer.alert(e.message);
+                            }
+                        },dataType:"json"
+                    });
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加</title>
+    <link rel="stylesheet" href="../../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+</head>
+<body>
+<form class="layui-form" style="margin-top: 50px;">
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">内容</label>
+        <div class="layui-input-inline">
+            <input type="text" name="content" required lay-verify="required" placeholder="请输入内容" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">图片地址</label>
+        <div class="layui-input-inline">
+            <input type="text" name="imgUrl" required lay-verify="required" disabled="disabled" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <img id="avatarImage">
+            <button type="button" class="layui-btn layui-btn-primary" id="editimg">上传</button>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script src="../../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.config({
+        base:'/layui/extends/cropper/'
+    }).use(['form','layer','croppers'], function(){
+        var form = layui.form,
+            layer=layui.layer,
+            croppers=layui.croppers,
+            $=layui.jquery;
+        form.on('submit(go)',function (data) {
+             $.ajax({
+                 url:"/microdiary/save",
+                 type:"POST",
+                 data:data.field,
+                 success:function (e) {
+                     if(e.success){
+                         window.parent.location.href='/microdiary/manage'
+                     }
+                 },
+                 dataType:"json"
+             });
+             return false;
+         });
+
+        //创建一个头像上传组件
+        croppers.render({
+            elem: '#editimg'
+            ,saveW:100     //保存宽度
+            ,saveH:100
+            ,mark:1/1    //选取比例
+            ,area:'1000px'  //弹窗宽度
+            ,url: "/uploadToZimg"  //图片上传接口返回和（layui 的upload 模块）返回的JOSN一样
+            ,done: function(url){ //上传完毕回调
+                $("input[name=imgUrl]").val(url);
+                $("#avatarImage").attr('src',url);
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  blog-core-application:
+    image: openjdk:8u212-jre-alpine
+    container_name: blog-core-application
+    volumes:
+      - ./app:/data/app
+      - ./logs:/data/logs
+    working_dir: /data/app
+    command: java -Xms128m -Xmx256m -jar blog-core-application-service.jar
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "8080:8080"
+    restart: always
+    network_mode: host

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加</title>
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+</head>
+<body>
+<form class="layui-form" style="margin-top: 50px;">
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">文件名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" required lay-verify="required" placeholder="请输入文件名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">文件路径</label>
+        <div class="layui-input-inline">
+            <input type="text" name="path" required lay-verify="required" placeholder="文件路径" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <button type="button" class="layui-btn" id="test3"><i class="layui-icon"></i>上传文件</button>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['layer','form','upload'],function () {
+        var layer = layui.layer,
+            form = layui.form,
+            upload = layui.upload,
+            $ = layui.jquery;
+        form.on('submit(go)',function (data) {
+             $.ajax({
+                 url:"/file/collection",
+                 type:"POST",
+                 data:data.field,
+                 success:function (e) {
+                     if(e.success){
+                         window.parent.location.href='/file/manage'
+                     }
+                 },
+                 dataType:"json"
+             });
+             return false;
+         });
+//指定允许上传的文件类型
+        upload.render({
+            elem: '#test3'
+            ,url: '/file/collection/upload'
+            ,accept: 'file' //普通文件
+            ,done: function(res){
+                alert(JSON.stringify(res))
+                $("input[name=path]").val(res);
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

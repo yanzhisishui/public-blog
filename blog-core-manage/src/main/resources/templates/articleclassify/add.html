@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+
+</head>
+<body>
+
+<form class="layui-form" style="width: 75%;margin:0 auto;margin-top: 50px;margin-left: 50px;">
+
+    <input type="hidden" name="parentId" th:value="${parent.id}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">上级分类</label>
+        <div class="layui-input-inline">
+            <input type="text" placeholder="默认上级分类" disabled th:value="${parent.name}"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" required lay-verify="required" placeholder="请输入分类名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类等级</label>
+        <div class="layui-input-inline">
+            <input type="text" name="level" disabled th:value="${parent.level+1}" required lay-verify="required"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script src="../../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['layer','form',],function () {
+        var layer = layui.layer,
+            form = layui.form,
+            $ = layui.jquery;
+        form.on('submit(go)',function (data) {
+            $.ajax({
+                url:"/article/classify/save",
+                type:"POST",
+                data:data.field,
+                success:function (e) {
+                    if(e.success){
+                        window.parent.location.href='/article/classify/manage'
+                    }
+                },
+                dataType:"json"
+            });
+            return false;
+        });
+
+
+    });
+</script>
+</body>
+</html>

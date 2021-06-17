@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+</head>
+<body>
+<form class="layui-form" style="margin-top: 50px;">
+    <input type="hidden" name="id" th:value="${regexp.id}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" th:value="${regexp.name}" required lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">表达式值</label>
+        <div class="layui-input-inline">
+            <input type="text" name="value" th:value="${regexp.value}" required lay-verify="required" placeholder="请输入表达式值" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script src="../../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['layer','form'],function () {
+        var layer = layui.layer,
+            form = layui.form,
+            $ = layui.jquery;
+
+        //监听提交
+        form.on('submit(go)', function(data){
+
+            $.ajax({
+                url:"/util/regexp/update",
+                type:"POST",
+                data:data.field,
+                success:function (e) {
+                    if(e.success){
+                        window.parent.location.href='/util/regexp/manage'
+                    }
+                },
+                dataType:"json"
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

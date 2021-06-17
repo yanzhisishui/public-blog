@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加</title>
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+</head>
+<body>
+<form style="margin-top: 20px;margin-left: 30%;" class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-inline">
+            <input type="text" name="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择关联文章</label>
+        <div class="layui-input-inline">
+            <select name="articleId" lay-verify="required">
+                <option th:each="item : ${articleList}" th:value="${item.id}" th:text="${item.title}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">内容</label>
+        <div class="layui-input-inline">
+            <input type="text" name="content" required lay-verify="required" placeholder="请输入内容" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">值</label>
+        <div class="layui-input-inline">
+            <input type="text" name="value" required lay-verify="required" placeholder="请输入值" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="checkbox" lay-skin="switch" lay-filter="switchTest" lay-text="启用|禁用">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择左右展示</label>
+        <div class="layui-input-block">
+            <input type="radio" lay-filter="flag" name="flag" value="LEFT" title="左边">
+            <input type="radio" lay-filter="flag" name="flag" value="CENTER" title="中间" checked>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">图片地址</label>
+        <div class="layui-input-inline">
+            <input type="text" name="imageUrl" required lay-verify="required" disabled="disabled" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <img id="avatarImage">
+            <button type="button" class="layui-btn layui-btn-primary" id="editimg">上传</button>
+            <button type="button" class="layui-btn layui-btn-normal" id="handlePaste">开启手动粘贴</button>
+            <span style="color: gray;">用于手动裁图通过admin页面上传图片到zimg</span>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-inline">
+            <input type="number" name="sort" required lay-verify="required" placeholder="请输入数字" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.config({
+        base:'/layui/extends/cropper/'
+    }).use(['form','layer','croppers'], function(){
+        var form = layui.form,
+            layer=layui.layer,
+            croppers=layui.croppers,
+            $=layui.jquery;
+
+        //监听禁用开关
+        var status=0;
+        form.on('switch(switchTest)', function(data){
+            status = this.checked ? 1 : 0;
+        });
+        /**
+         * 监听单选按钮
+         * */
+        var width=1200;
+        form.on('radio(flag)', function(data){
+            var value = data.value; //被点击的radio的value值
+            if(value == 'LEFT'){
+                width=600;
+            }else if(value == 'CENTER'){
+                width=1200;
+            }
+        });
+
+        //监听提交
+        form.on('submit(go)', function(data){
+            data.field.status = status;
+            $.ajax({
+                url:'/banner/save',
+                type:'POST',
+                data:data.field,
+                success:function (e) {
+                    if(e.success){
+                        window.parent.location.href='/banner/manage'
+                    }else{
+                        alert(e.message);
+                    }
+                },dataType:"json"
+            });
+            return false;
+        });
+
+        /*手动粘贴*/
+        $("#handlePaste").click(function () {
+            $("input[name=imageUrl]").removeAttr("disabled");
+        });
+
+
+        //创建一个头像上传组件
+        croppers.render({
+            elem: '#editimg'
+            ,saveW:width     //保存宽度
+            ,saveH:width/2
+            ,mark:2/1    //选取比例
+            ,area:'1000px'  //弹窗宽度
+            ,url: "/uploadToZimg"  //图片上传接口返回和（layui 的upload 模块）返回的JOSN一样
+            ,done: function(url){ //上传完毕回调
+                $("input[name=imageUrl]").val(url+(width == 1200 ? "?w=600&q=100" : "?p=0"));
+                $("#avatarImage").attr('src',url+"?p=0");
+            }
+        });
+
+    });
+</script>
+</body>
+</html>

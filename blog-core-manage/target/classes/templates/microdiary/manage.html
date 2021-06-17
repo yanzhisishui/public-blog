@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>技能</title>
+    <link th:href="@{/layui/css/layui.css}" href="../../static/layui/css/layui.css" rel="stylesheet"/>
+</head>
+<body>
+
+<table class="layui-hide" id="lifeTable" lay-filter="lifeTable"></table>
+
+<script type="text/html" id="topBar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-normal" lay-event="add">添加</button>
+    </div>
+</script>
+
+<script type="text/html" id="rightBar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+<script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['table','layer'], function(){
+        var table = layui.table,
+            $=layui.jquery,
+            layer=layui.layer;
+        table.render({
+            elem: '#lifeTable'
+            ,url:'/microdiary/queryListPage'
+            ,toolbar: '#topBar'
+            ,cols: [  [
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id', title:'ID', width:80, fixed: 'left'}
+                ,{field:'content', title:'内容', width:320}
+                ,{field:'imgUrl', title:'图片', width:100,templet:function (d) {
+                        return '<div><img src='+d.imgUrl+'></div>'
+                    }}
+                ,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:250}
+            ]  ]
+            ,page: true
+        });
+
+        //头工具栏事件
+        table.on('toolbar(lifeTable)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            var data = checkStatus.data;
+            switch(obj.event){
+                case 'add':
+                    var open = layer.open({
+                        type: 2,
+                        title: "添加",
+                        content:"/microdiary/add"
+                    });
+                    layer.full(open);
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(lifeTable)', function(obj){
+            var data = obj.data;
+            //console.log(obj)
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.ajax({
+                        url:"/microdiary/delete",
+                        type:"POST",
+                        data:{"id":data.id},
+                        success:function (e) {
+                            if(e.success){
+                                obj.del();
+                                layer.close(index);
+                            }else{
+                                alert(e.msg);
+                            }
+                        },dataType:"json"
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                var open = layer.open({
+                    type: 2,
+                    title: "编辑",
+                    content: '/microdiary/edit?id='+data.id
+                });
+                layer.full(open);
+            }
+        });
+    });
+</script>
+</body>
+</html>

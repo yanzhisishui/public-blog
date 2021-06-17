@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑</title>
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+</head>
+<body>
+<form class="layui-form" style="margin-top: 50px;">
+    <input type="hidden" name="id" th:value="${notice.id}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-inline">
+            <input type="text" th:value="${notice.title}" name="title" required  lay-verify="required" placeholder="请输入名称"  class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block">
+            <textarea name="description" th:text="${notice.description}" placeholder="请输入描述" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">内容</label>
+        <div class="layui-input-block">
+            <textarea name="content" th:text="${notice.content}" placeholder="请输入内容" class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+            <button type="reset" disabled="disabled" class="layui-btn layui-btn-primary layui-btn-disabled">重置</button>
+        </div>
+    </div>
+</form>
+
+<script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['layer','form'],function () {
+        var layer = layui.layer,
+            form = layui.form,
+            $ = layui.jquery;
+        form.on('submit(go)',function (data) {
+            $.ajax({
+                url:"/notice/update",
+                type:"POST",
+                data:data.field,
+                success:function (e) {
+                    if(e.success){
+                        window.parent.location.href='/notice/manage'
+                    }
+                },
+                dataType:"json"
+            });
+            return false;
+        });
+        
+    });
+</script>
+</body>
+</html>

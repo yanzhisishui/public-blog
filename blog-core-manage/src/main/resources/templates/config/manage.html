@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>配置管理</title>
+    <link th:href="@{/layui/css/layui.css}" href="../../../static/layui/css/layui.css" rel="stylesheet"/>
+</head>
+<body>
+
+<table class="layui-hide" id="configTable" lay-filter="configTable"></table>
+
+<script type="text/html" id="topBar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-normal" lay-event="add">添加</button>
+    </div>
+</script>
+
+<script type="text/html" id="rightBar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+<script src="../../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['table','layer'], function(){
+        var table = layui.table,
+            $=layui.jquery,
+            layer=layui.layer;
+
+
+        table.render({
+            elem: '#configTable'
+            ,url:'/baseConfig/queryListPage'
+            ,toolbar: '#topBar'
+            ,cols: [  [
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id', title:'ID', width:80, fixed: 'left'}
+                ,{field:'name', title:'名称', width:180}
+                ,{field:'value', title:'值', width:300}
+                ,{field:'description', title:'描述', width:280}
+                ,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:250}
+            ]  ]
+            ,page: true
+        });
+
+        //头工具栏事件
+        table.on('toolbar(configTable)', function(obj){
+            var checkStatus = table.checkStatus(obj.config.id);
+            var data = checkStatus.data;
+            switch(obj.event){
+                case 'add':
+                    var open = layer.open({
+                        type: 2,
+                        area:['500px','460px'],
+                        title: "配置添加",
+                        content:"/baseConfig/add"
+                    });
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(configTable)', function(obj){
+            var data = obj.data;
+            //console.log(obj)
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.ajax({
+                        url:"/baseConfig/delete",
+                        type:"POST",
+                        data:{"id":data.id},
+                        success:function (e) {
+                            if(e.success){
+                                obj.del();
+                                layer.close(index);
+                            }else{
+                                alert(e.msg);
+                            }
+                        },dataType:"json"
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                var open = layer.open({
+                    type: 2,
+                    area:['500px','460px'],
+                    title: "配置更新",
+                    content: '/baseConfig/edit?id='+data.id
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

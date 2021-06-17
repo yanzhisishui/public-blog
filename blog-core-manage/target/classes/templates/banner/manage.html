@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>导航图</title>
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet"/>
+</head>
+<body>
+
+
+<table class="layui-hide" id="bannerTable" lay-filter="bannerTable"></table>
+
+<script type="text/html" id="topBar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-normal" lay-event="add">添加</button>
+    </div>
+</script>
+
+<script type="text/html" id="rightBar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+<script th:src="@{/layui/layui.js}"></script>
+
+<script>
+    layui.use(['table','layer'], function(){
+        var table = layui.table,
+            $=layui.jquery,
+            layer=layui.layer;
+
+
+        table.render({
+            elem: '#bannerTable'
+            ,url:'/banner/queryListPage'
+            ,toolbar: '#topBar'
+            ,title: '导航图'
+            ,cols: [  [
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id', title:'ID', width:80, fixed: 'left'}
+                ,{field:'title', title:'标题', width:260}
+                ,{field:'flag', title:'左右', width:120}
+                ,{field:'content', title:'内容', width:220}
+                ,{field:'status', title:'状态', width:80}
+                ,{field:'value', title:'值', width:100}
+                ,{field:'imageUrl', title:'封面图地址', width:150}
+                ,{field:'sort', title:'排序', width:80}
+                ,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:250}
+            ]  ]
+            ,page: true
+        });
+
+        //头工具栏事件
+        table.on('toolbar(bannerTable)', function(obj){
+
+            switch(obj.event){
+                case 'add':
+                    var open = layer.open({
+                        type: 2,
+                        area:['60%','90%'],
+                        title: "添加",
+                        content: '/banner/add'
+                    });
+                    layer.full(open);
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(bannerTable)', function(obj){
+            var data = obj.data;
+            //console.log(obj)
+            if(obj.event === 'del'){
+                layer.confirm('真的删除吗',{icon:3,title:"提示"}, function(index){
+                    $.ajax({
+                        url:'/banner/delete',
+                        type:'POST',
+                        data:{"id":data.id},
+                        success:function (e) {
+                            if(e.success){
+                                obj.del();
+                                layer.close(index);
+                            }else{
+                                alert(e.message);
+                            }
+                        },dataType:"json"
+                    });
+
+                });
+            } else if(obj.event === 'edit'){
+                var open = layer.open({
+                    type: 2,
+                    area:['60%','90%'],
+                    title: "编辑",
+                    content: '/banner/edit?id='+data.id
+                });
+                layer.full(open);
+            }
+        });
+
+
+
+    });
+</script>
+</body>
+</html>

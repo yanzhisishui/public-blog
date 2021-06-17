@@ -1,0 +1,27 @@
+
+application:
+  zimg_upload_url: http://129.204.178.49:4869/upload
+  zimg_address_url: http://129.204.178.49:4869/
+  video_upload_url: E:\\video
+  video_address_url: http://localhost:${server.port}/files/video/
+
+spring:
+  datasource:
+    # 配置数据源
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 使用druid连接池
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: 123456
+
+  elasticsearch:
+    rest:
+      uris: http://129.204.178.49:9200
+
+  thymeleaf:
+    cache: false
+    #redis相关
+  redis:
+    timeout: 2000
+    host: 129.204.178.49

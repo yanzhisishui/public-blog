@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  blog-core-manage:
+    image: java:8
+    container_name: blog-core-manage
+    volumes:
+      - ./app:/data/app
+      - ./logs:/data/logs
+      - /docker/video:/docker/video
+      - /docker/blog-core-onlineutils-service/fonts:/usr/share/fonts
+    working_dir: /data/app
+    command: java -Xms128m -Xmx256m -jar blog-core-manage.jar
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - "8083:8083"
+    network_mode: host

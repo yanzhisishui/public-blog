@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加</title>
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+    <style>
+    </style>
+</head>
+<body>
+
+<form class="layui-form" style="margin-top: 50px;" action="">
+    <input type="hidden" name="id" th:value="${article.id}">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">文章标题</label>
+            <div class="layui-input-inline">
+                <input type="text" th:value="${article.title}" name="title" required  lay-verify="required" placeholder="请输入文章标题" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-inline">
+            <label class="layui-form-label">封面图地址</label>
+            <div class="layui-input-inline">
+                <input type="text" th:value="${article.imageUrl}" name="imageUrl" disabled required  lay-verify="required" placeholder="封面图地址" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">封面图</label>
+        <div class="layui-input-block">
+            <img th:src="${article.imageUrl}" width="300" height="150" id="avatarImage">
+            <button type="button" class="layui-btn layui-btn-primary" id="editimg">上传</button>
+            <button type="button" class="layui-btn layui-btn-normal" id="handlePaste">开启手动粘贴</button>
+            <span style="color: gray;">用于手动裁图通过admin页面上传图片到zimg</span>
+        </div>
+
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">封面描述</label>
+        <div class="layui-input-block" style="width: 400px">
+            <textarea id="description" th:text="${article.description}" name="description" placeholder="请输入内容" class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item category"></div>
+
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+
+<div class="layui-form">
+    <div class="layui-form-item">
+        <textarea id="layeditDemo"></textarea>
+    </div>
+</div>
+
+<script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script src="/plugins/ace/ace.js"></script>
+
+
+<script th:inline="javascript">
+    var content=[[${article.content}]];
+    var list=[[${list}]];
+
+</script>
+<script>
+
+    layui.config({
+        base: '/layui/extends/' // 启动web
+    }).extend({
+        interact:'interact',
+        croppers:'cropper/croppers'
+    }).use(['layer','layedit','interact','form','croppers'],function () {
+        var layer = layui.layer,
+            layedit = layui.layedit,
+            form = layui.form,
+            croppers = layui.croppers,
+            interact = layui.interact,
+            $ = layui.jquery;
+
+        croppers.render({
+            elem: '#editimg'
+            ,saveW:600     //保存宽度
+            ,saveH:300
+            ,mark:2/1    //选取比例
+            ,area:'1000px'  //弹窗宽度
+            ,url: "/uploadToZimg"  //图片上传接口返回和（layui 的upload 模块）返回的JOSN一样
+            ,done: function(url){ //上传完毕回调
+                $("input[name=imageUrl]").val(url+"?p=0");
+                $("#avatarImage").attr('src',url+"?p=0");
+            }
+        });
+
+        /*手动粘贴*/
+        $("#handlePaste").click(function () {
+            $("input[name=imageUrl]").removeAttr("disabled");
+        });
+        //监听字数变化
+        $('#description').bind('input propertychange', function(){
+            var length = $("#description").val().length;
+            layer.tips('当前字数:'+length, $("#description"), {
+                tips: [2, '#3595CC'],
+            });
+        });
+
+
+
+        form.on('submit(go)',function (data) {
+            var fieldElement = data.field[Object.keys(data.field)[Object.keys(data.field).length - 1]];
+            data.field.classifyId = fieldElement;
+            data.field.content = layedit.getContent(ieditor);
+             $.ajax({
+                 url:"/article/update",
+                 type:"POST",
+                 data:data.field,
+                 success:function (e) {
+                     if(e.success){
+                         window.parent.location.href='/article/manage'
+                     }
+                 },
+                 dataType:"json"
+             });
+            return false;
+        });
+
+
+        interact.render({
+            elem : '.category',
+            title : '文章分类',
+            url : "/article/classify/selectList",//获取数据的接口
+            name : '文章分类',
+            selected: list,
+            key:"key"//<select>标签的name字段名
+        });
+
+        layedit.set({
+            //暴露layupload参数设置接口 --详细查看layupload参数说明
+            uploadImage: {
+                url: '/uploadToZimgResource',
+                accept: 'image',
+                acceptMime: 'image/*',
+                exts: 'jpg|png|gif|bmp|jpeg',
+                size: '10240'
+            }
+            , uploadVideo: {
+                url: '/uploadVideo',
+                accept: 'video',
+                acceptMime: 'video/*',
+                exts: 'mp4|flv|avi|rm|rmvb',
+                size: '102400'
+            }
+            //右键删除图片/视频时的回调参数，post到后台删除服务器文件等操作，
+            //传递参数：
+            //图片： imgpath --图片路径
+            //视频： filepath --视频路径 imgpath --封面路径
+            //, calldel: {
+            //    url: '/Attachment/DeleteFile'
+            //}
+            //开发者模式 --默认为false
+            , devmode: true
+            //插入代码设置
+            , codeConfig: {
+                hide: true,  //是否显示编码语言选择框
+                default: 'javascript' //hide为true时的默认语言格式
+            }
+            , tool: [
+                'html', 'undo', 'redo', 'code', 'strong', 'italic', 'underline', 'del', 'addhr', '|','removeformat', 'fontFomatt', 'fontfamily','fontSize', 'fontBackColor', 'colorpicker', 'face'
+                , '|', 'left', 'center', 'right', '|', 'link', 'unlink', 'images', 'image_alt', 'video','attachment'
+                , '|'
+                , 'table','customlink'
+                , 'fullScreen'
+            ]
+            , height: '90%'
+        });
+        var ieditor = layedit.build('layeditDemo');
+        layedit.setContent(ieditor,content,false);
+    });
+
+
+
+</script>
+
+</body>
+</html>

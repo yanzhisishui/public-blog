@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑</title>
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}">
+</head>
+<body>
+<form class="layui-form" style="margin-top: 50px;">
+    <input type="hidden" name="id" th:value="${file.id}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">技术名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" th:value="${file.name}" required lay-verify="required" placeholder="请输入技术名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">掌握度</label>
+        <div class="layui-input-inline">
+            <input type="text" th:value="${file.dataNum}" name="dataNum" required lay-verify="required" placeholder="请输入掌握度" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择颜色</label>
+        <div class="layui-input-inline" style="width: 120px;">
+            <input type="text" th:value="${file.color}" name="color"  placeholder="请选择颜色" class="layui-input" id="color-pick-input">
+        </div>
+        <div class="layui-inline" style="left: -11px;">
+            <div id="colorPick"></div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-inline">
+            <input type="number" name="sort" th:value="${file.sort}" required lay-verify="required" placeholder="请输入排序" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input th:if="${file.status == 1}" type="radio" name="status" value="1" title="启用" checked="">
+            <input th:if="${file.status == 1}" type="radio" name="status" value="0" title="禁用">
+            <input th:if="${file.status == 0}" type="radio" name="status" value="1" title="启用">
+            <input th:if="${file.status == 0}" type="radio" name="status" value="0" title="禁用" checked="">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['layer','form','colorpicker'],function () {
+        var layer = layui.layer,
+            form = layui.form,
+            colorpicker = layui.colorpicker,
+            $ = layui.jquery;
+        form.on('submit(go)',function (data) {
+            $.ajax({
+                url:"/file/update",
+                type:"POST",
+                data:data.field,
+                success:function (e) {
+                    if(e.success){
+                        window.parent.location.href='/file/manage'
+                    }
+                },
+                dataType:"json"
+            });
+            return false;
+        });
+
+        //表单赋值
+        colorpicker.render({
+            elem: '#colorPick'
+            ,color: '#1c97f5'
+            ,done: function(color){
+                $('#color-pick-input').val(color);
+            }
+        });
+    });
+</script>
+</body>
+</html>

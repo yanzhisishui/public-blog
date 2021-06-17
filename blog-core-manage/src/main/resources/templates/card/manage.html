@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link th:href="@{/layui/css/layui.css}" href="../../static/layui/css/layui.css" rel="stylesheet"/>
+    <style>
+        .file {
+            position: relative;
+            display: inline-block;
+            background: #D0EEFF;
+            border: 1px solid #99D3F5;
+            border-radius: 4px;
+            padding: 4px 12px;
+            overflow: hidden;
+            color: #1E88C7;
+            text-decoration: none;
+            text-indent: 0;
+            line-height: 20px;
+        }
+
+
+    </style>
+<body>
+
+<div>
+    <div style="width: 40%;float: left;">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">网名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="nickname" th:value="${card.nickname}" required  lay-verify="required" placeholder="请输入网名" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">职业</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="profession" th:value="${card.profession}" required  lay-verify="required" placeholder="请输入职业" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">现居</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="addressNow" th:value="${card.addressNow}" required lay-verify="required" placeholder="请输入现居" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">辅助文字</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="email" th:value="${card.email}" lay-verify="email" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">头像</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="avatar" th:value="${card.avatar}" readonly="readonly" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <img id="avatarImage" width="100" height="100" th:src="${card.avatar}">
+                    <button type="button" class="layui-btn layui-btn-primary" id="editimg">修改图片</button>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">爱好</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="hobby" th:value="${card.hobby}" required lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">个人简介</label>
+                <div class="layui-input-block">
+                    <textarea name="introduction" th:text="${card.introduction}" placeholder="请输入简介" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+    <div style="width:40%;float: left;">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">网站logo</label>
+                <img th:src="${logoUrl}">
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择</label>
+                <input id="logo" class="file"  type="file">
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">操作</label>
+                <button type="button" class="layui-btn layui-btn-normal" id="logoBtn">修改网站logo</button>
+            </div>
+        </form>
+        <hr>
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">我的头像</label>
+                <img width="100" height="100" th:src="${card.avatar}">
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择</label>
+                <input id="avatar" class="file" type="file">
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">操作</label>
+                <button type="button" class="layui-btn layui-btn-normal" id="avatarBtn">修改我的头像logo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+<script>
+
+    layui.config({
+        base:'/layui/extends/cropper/'
+    }).use(['layer','form','upload','croppers'], function(){
+        var form=layui.form,
+            $=layui.jquery,
+            croppers = layui.croppers,
+            layer=layui.layer;
+
+        //监听提交
+            form.on('submit(go)',function (data) {
+            var len = data.field.introduction.length;
+            if(len >81 || len < 62){
+                layer.msg("为了保证页面美观，个人简介的字数要在62 - 81之间");
+                return false;
+            }
+            $.ajax({
+                url:"/baseConfig/updateCard",
+                type:"POST",
+                data:data.field,
+                success:function (e) {
+                    layer.msg(e.success ? "修改成功" : e.message);
+                },dataType:"json"
+            });
+            return false;
+        });
+
+
+
+        $("#logoBtn").click(function () {
+            if($("#logo").val() == ""){
+                layer.msg("请选择图片");
+                return;
+            }
+            var formData=new FormData();
+            var file = document.getElementById("logo").files[0];
+            formData.append('file',file);
+            $.ajax({
+                type:"post",
+                url: "/uploadToZimg", //用于文件上传的服务器端请求地址
+                data: formData,
+                processData: false,
+                contentType: false,
+                success:function(e){
+                   if(e.code == 0){
+                       var logoName=e.data.src;
+                       $.ajax({
+                           url:"/baseConfig/updateLogo",
+                           type:"POST",
+                           success:function (ex) {
+                                if(ex.success){
+                                    layer.alert("修改网站logo成功")
+                                }
+                           },
+                           data:{"logoName":logoName},
+                           dataType:"json"
+                       });
+                   }else{
+                       alert("修改网站logo失败")
+                   }
+                },dataType:"json"
+            });
+        });
+
+        $("#avatarBtn").click(function () {
+            if($("#avatar").val() == ""){
+                layer.msg("请选择图片");
+                return;
+            }
+            var formData=new FormData();
+            var file = document.getElementById("avatar").files[0];
+            formData.append('file',file);
+            $.ajax({
+                type:"post",
+                url: "/uploadToZimg", //用于文件上传的服务器端请求地址
+                data: formData,
+                processData: false,
+                contentType: false,
+                success:function(e){
+                    if(e.code == 0){
+                        var avatarName=e.data.src;
+                        $.ajax({
+                            url:"/baseConfig/updateAvatar",
+                            type:"POST",
+                            success:function (ex) {
+                                if(ex.success){
+                                    layer.alert("修改我的头像成功")
+                                }
+                            },
+                            data:{"avatarName":avatarName},
+                            dataType:"json"
+                        });
+                    }else{
+                        alert("修改网站logo失败")
+                    }
+                },dataType:"json"
+            });
+        });
+        //创建一个头像上传组件
+        croppers.render({
+            elem: '#editimg'
+            ,saveW:150     //保存宽度
+            ,saveH:150
+            ,mark:1/1    //选取比例
+            ,area:'900px'  //弹窗宽度
+            ,url: "/uploadToZimg"  //图片上传接口返回和（layui 的upload 模块）返回的JOSN一样
+            ,done: function(url){ //上传完毕回调
+                $("input[name=avatar]").val(url);
+                $("#avatarImage").attr('src',url);
+            }
+        });
+    });
+
+
+
+</script>
+</body>
+</html>

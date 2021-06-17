@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link th:href="@{/layui/css/layui.css}" href="../../static/layui/css/layui.css" rel="stylesheet"/>
+</head>
+<body>
+
+
+<table class="layui-hide" id="onlineutils" lay-filter="onlineutils"></table>
+
+<script type="text/html" id="topBar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-normal" lay-event="add">添加</button>
+    </div>
+</script>
+
+<script type="text/html" id="rightBar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+<script src="../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+
+<script>
+    layui.use(['table','layer'], function(){
+        var table = layui.table,
+            $=layui.jquery,
+            layer=layui.layer;
+
+
+        table.render({
+            elem: '#onlineutils'
+            ,url:'/onlineutils/queryListPage'
+            ,toolbar: '#topBar'
+            ,title: ''
+            ,cols: [  [
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id', title:'ID', width:80, fixed: 'left'}
+                ,{field:'title', title:'标题', width:120}
+                ,{field:'description', title:'描述', width:220}
+                ,{field:'icon', title:'图标', width:180}
+                ,{field:'status', title:'状态', width:80,templet:function (d) {
+                        return d.status == 0 ? "禁用" : "启用";
+                    }}
+                ,{field:'url', title:'跳转链接', width:300}
+                ,{field:'sort', title:'排序', width:80}
+                ,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:250}
+            ]  ]
+            ,page: true
+        });
+
+        //头工具栏事件
+        table.on('toolbar(onlineutils)', function(obj){
+
+            switch(obj.event){
+                case 'add':
+                    layer.open({
+                        type: 2,
+                        area:['60%','90%'],
+                        title: "添加",
+                        content: '/onlineutils/add'
+                    });
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(onlineutils)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除吗',{icon:3,title:"提示"}, function(index){
+                    $.ajax({
+                        url:'/onlineutils/delete',
+                        type:'POST',
+                        data:{"id":data.id},
+                        success:function (e) {
+                            if(e.success){
+                                obj.del();
+                                layer.close(index);
+                            }else{
+                                alert(e.message);
+                            }
+                        },dataType:"json"
+                    });
+
+                });
+            } else if(obj.event === 'edit'){
+                layer.open({
+                    type: 2,
+                    area:['60%','90%'],
+                    title: "编辑",
+                    content: '/onlineutils/edit?id='+data.id
+                });
+            }
+        });
+
+
+
+    });
+</script>
+</body>
+</html>

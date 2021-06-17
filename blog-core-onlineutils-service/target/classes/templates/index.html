@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>孙玉超个人博客-在线工具</title>
+    <meta name="Description" content="程序员在线工具" />
+    <meta name="Keywords" content="个人博客,Java技术，Java学习" />
+    <link href="https://www.sunyuchao.com/static/css/fontawesome4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link href="https://www.sunyuchao.com/static/layui/css/layui.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://www.sunyuchao.com/static/css/common.css">
+    <script th:src="${iconfontUrl}"></script>
+    <link rel="icon" type="image/x-icon" href="https://www.sunyuchao.com/static/images/favicon.ico">
+    <style>
+
+        .content{
+            display: flex;
+            width: 62%;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .title{width: 62%;margin: 0 auto;margin-top: 20px;}
+        .content .card,.end{
+            box-shadow: 0 0 20px #DFDFDF;
+            width: 24%;
+            height: 230px;
+            margin-top: 15px;
+            transition: all 1s;
+            position: relative;
+        }
+
+        .end h1,.end p {width: 80%;margin:  0 auto;}
+        .end .more{color: #008FF4;margin-top: 30px;}
+        .end .more-content{color: #555;margin-top:20px; }
+        .end .wait{color: #777;margin-top:20px; }
+
+        .content .card:hover{ background-color: rgb(251,251,251);}
+
+        .card .card-title{text-align: center;font-weight: bold;margin-top: 15px;}
+        .card .uitl-icon{text-align: center;font-weight: normal;height: 80px;overflow: hidden;}
+        .card .uitl-icon svg{font-size: 80px;}
+        .card .card-content{padding:0 20px 10px 20px;text-indent: 2em;}
+        .card .go{float: right;margin-right: 20px;width: 80px;}
+        .card .card-opt{position: absolute;bottom: 10px;width: 80%;left: 10%;display: flex;}
+        .card .card-opt a{margin: 0 15px;}
+        .card .card-opt a i{font-size: 25px;}
+
+        /*小屏幕 1366 x 768*/
+        @media screen and (max-width: 1366px) {
+            .content,.title{
+                width: 88%;
+            }
+
+        }
+        /*手机*/
+        @media screen and (max-width: 980px) {
+            .content .card{height: 200px;}
+            .content .card .card-opt{display: none;}
+            .end .more,.end .wait{font-size: 20px;margin-top: 20px;}
+            .end .more-content{font-size: 13px;}
+        }
+    </style>
+</head>
+<body>
+<!--搜索-->
+<div class="search" th:fragment="search">
+    <form>
+        <input type="text" placeholder="装饰...">
+        <button id="go" type="submit"></button>
+    </form>
+</div>
+<!--右下角固定-->
+<div id="permanent" th:fragment="permanent">
+    <ul>
+        <li id="toTop"><a href="javascript:;"><i class="layui-icon layui-icon-top"></i></a></li>
+        <li id="util-feedback"><a href="javascript:;"><i class="layui-icon layui-icon-edit"></i></a></li>
+        <li id="share"><a href="javascript:;"><i class="layui-icon layui-icon-share"></i></a></li>
+        <li><a href="tencent://message/?uin=1481232419&Site=&Menu=yes"><i style="color: blueviolet;" class="layui-icon layui-icon-login-qq"></i></a></li>
+    </ul>
+    <div id="share-div" style="display: none;width: 170px;">
+        <span>分享到：&nbsp;</span>
+        <a href="http://connect.qq.com/widget/shareqq/index.html?url=https://www.sunyuchao.com" target="_blank">
+            <svg class="icon" style="font-size: 30px;" aria-hidden="true"><use xlink:href="#layui-extend-qq"></use></svg>
+        </a>
+        <a href="http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://www.sunyuchao.com" target="_blank">
+            <svg class="icon" style="font-size: 30px;" aria-hidden="true"><use xlink:href="#layui-extend-qzone"></use></svg>
+        </a>
+        <a href="http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://www.sunyuchao.com" target="_blank">
+            <svg class="icon" style="font-size: 30px;" aria-hidden="true"><use xlink:href="#layui-extend-weibo"></use></svg>
+        </a>
+    </div>
+</div>
+
+<div class="top" th:fragment="top">
+    <div class="top-center">
+        <div class="top-center-l">
+            <img th:src="${logoUrl}">
+        </div>
+        <div class="top-center-c">
+            <ul class="nav">
+                <li><a href="https://www.sunyuchao.com/">首&nbsp;&nbsp;页</a></li>
+                <li><a href="https://www.sunyuchao.com/learning">爱学习</a></li>
+                <li><a href="https://www.sunyuchao.com/life">微动态</a></li>
+                <li class="nav-this"><a href="/">工具集</a></li>
+                <li><a href="https://www.sunyuchao.com/aboutme">关于我</a></li>
+                <li><a href="https://www.sunyuchao.com/message">留言板</a></li>
+            </ul>
+        </div>
+        <div th:fragment="top-center-r" class="top-center-r">
+            <span th:if="${session.loginUser == null }"><a id="util-login" href="javascript:;">登录</a> / <a id="util-regist" href="javascript:;">注册</a></span>
+            <ul th:if="${session.loginUser != null }" class="layui-nav"> <!--登录之后显示-->
+                <li class="layui-nav-item">
+                    <a href="javascript:;">
+                        <img width="50" height="50" class="radius" th:src="${session.loginUser.avatar}">
+                    </a>
+                    <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                        <dd><a href="javascript:;" id="personCenter">个人中心</a></dd>
+                        <dd><a href="javascript:;" id="myMessage">我的消息<span class="layui-badge-dot"></span></a></dd>
+                        <dd th:if="${session.loginUser.identityType == 'EMAIL'}"><a href="javascript:;" id="modifyPass">忘记密码</a></dd>
+                        <dd><a href="/login/exit">退出</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<div class="title"><h1 style="font-weight: bold;">在线工具</h1></div>
+<div class="content">
+    <div th:each="util : ${onlineutilsList}" th:class="${util.status == 1 ? 'card':'card layui-btn-disabled'}">
+        <h2 class="card-title" th:text="${util.title}"></h2>
+        <h6 class="uitl-icon"><svg class="icon" aria-hidden="true"><use th:xlink:href=${util.icon}></use></svg></h6>
+        <p class="card-content" th:text="${util.description}"></p>
+        <a th:if="${util.status == 1}" th:href="@{${util.url}(bindId=${util.id})}" class="layui-btn layui-btn-normal layui-btn-xs go">去试试</a>
+        <button th:if="${util.status == 0}" class="layui-btn layui-btn-disabled layui-btn-xs go">去试试</button>
+        <p class="card-opt">
+            <a href=""><i class="layui-icon layui-icon-share"></i></a>
+            <a href=""><i class="layui-icon layui-icon-rate"></i></a>
+            <a href=""><i class="layui-icon layui-icon-dialogue"></i></a>
+        </p>
+    </div>
+
+
+    <div class="card end layui-btn-disabled">
+        <h1 class="more">更多工具</h1>
+        <p class="more-content">由于人单力薄。。。更多工具博主正在构思中。如果您有好的建议也可以反馈</p>
+        <h1 class="wait">敬请期待......</h1>
+    </div>
+
+</div>
+<div class="footer">
+    <p>Design by：暮色妖娆丶 备案号：皖ICP备19018192号</p>
+</div>
+
+<script src="https://www.sunyuchao.com/static/layui/layui.js"></script>
+<script src="https://www.sunyuchao.com/static/js/jquery3.3.1.min.js"></script>
+<script>
+    //注意：导航 依赖 element 模块，否则无法进行功能性操作
+    layui.use(['element','layer'], function(){
+        var element = layui.element,
+            layer=layui.layer,
+            $=layui.jquery;
+
+        $(".content .layui-btn-disabled").click(function () {
+            layer.alert("正在玩命开发中....再多给点时间吧  <img src='/layui/images/face/1.gif'>");
+        });
+
+        //…
+    });
+</script>
+<script src="https://www.sunyuchao.com/static/js/heart.js"></script>
+<script src="https://www.sunyuchao.com/static/js/common.js"></script>
+<script src="/login.js"></script>
+</body>
+</html>

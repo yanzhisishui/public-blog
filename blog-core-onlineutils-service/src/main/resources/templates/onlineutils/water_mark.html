@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>图片添加水印</title>
+    <link href="https://www.sunyuchao.com/static/layui/css/layui.css"  rel="stylesheet">
+
+    <link href="https://www.sunyuchao.com/static/css/fontawesome4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link href="https://www.sunyuchao.com/static/css/utilscommon.css"  rel="stylesheet">
+    <link href="https://www.sunyuchao.com/static/css/common.css" rel="stylesheet" >
+    <link href="https://www.sunyuchao.com/static/css/reply.css" rel="stylesheet" >
+    <script th:src="${iconfontUrl}"></script>
+
+    <style>
+        .tab-wrap{background-color: white;padding: 3px 10px;margin-top: 10px;}
+        .tab-wrap .tab-wrap-square{padding: 5px;margin-bottom: 10px;position: relative;border-bottom: 1px solid #e7e7e7;
+            padding-bottom: 10px;padding-top: 12px;}
+        .tab-wrap .tab-wrap-square::after {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2.5px!important;
+            width: 100px;
+            background-color: #51aded;
+            content: '';
+            transition:width 2s;
+            -moz-transition:width 2s; /* Firefox 4 */
+            -webkit-transition:width 2s; /* Safari and Chrome */
+            -o-transition:width 2s; /* Opera */
+        }
+        /*鼠标悬停div修改子元素样式*/
+        .tab-wrap:hover .tab-wrap-square:first-child::after{
+            width: 400px;
+        }
+
+        .tab-wrap .reply-all-head{font-size: 18px;font-weight: bold;}
+
+
+
+
+        #mark_text{position: absolute;top: 30px;left: 330px;font-size: 20px;font-family: 微软雅黑;display: none;}
+        #mark_text:hover{cursor: move;}
+
+        #bold,#italic{width: 38px;height: 38px;padding: 0;border: 1px solid #e6e6e6;background-color: rgb(247,247,247)}
+        #box{margin-top: 20px;}
+        /*手机*/
+        @media screen and (max-width: 980px) {
+            .smb-right{width:88%;}
+        }
+    </style>
+</head>
+<body>
+<!--搜索-->
+<div th:replace="index :: search"></div>
+<!--右下角固定-->
+<div th:replace="index :: permanent"></div>
+<div th:replace="index :: top"></div>
+<div class="content">
+    <h1 class="square">
+        <span class="f-right">曾经沧海难为水，除却巫山不是云 —— 元稹</span>
+    </h1>
+    <input type="hidden" th:value="${bindId}" name="id">
+    <div>
+        <h2>图片添加水印</h2>
+
+        <div id="box" style="text-align: center;position: relative;">
+            <span id="mark_text">水印文字</span>
+            <img id="origin_image" style="display: none;" src="">
+        </div>
+        <div style="text-align: center;margin-top: 20px;">
+            <button id="uploadOrigin" class="layui-btn layui-btn-normal layui-btn-lg">上传图片</button>
+            <button id="download" disabled="disabled" class="layui-btn layui-btn-normal layui-btn-lg layui-btn-disabled">下载水印图</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <form class="layui-form">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" value="水印文字" id="text" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 25px;">
+                        <label class="layui-form-label">透明度</label>
+                        <div class="layui-input-inline">
+                            <div id="slideTest7" style="margin-top: 18px"></div>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button id="logoUpload" type="button" class="layui-btn layui-btn-normal layui-btn-disabled">Logo水印</button>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <div class="layui-btn-group">
+                            <button id="bold"  type="button" class="layui-btn layui-btn-primary"><b>B</b></button>
+                            <button id="italic"  type="button"  class="layui-btn layui-btn-primary"><b><i>I</i></b></button>
+                            <div id="test9" style="margin-top: 5px;"></div>
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="width: 120px;margin-left: -20px;">
+                        <select lay-filter="font" name="fontfamily" lay-verify="required" >
+                            <option value="微软雅黑">微软雅黑</option>
+                            <option value="黑体">黑体</option>
+                            <option value="宋体">宋体</option>
+                            <option value="新宋体">新宋体</option>
+                            <option value="仿宋">仿宋</option>
+                            <option value="楷体">楷体</option>
+                            <option value="幼圆">幼圆</option>
+                            <option value="华文仿宋">华文仿宋</option>
+                            <option value="华文行楷">华文行楷</option>
+                            <option value="隶书">隶书</option>
+                            <option value="华文彩云">华文彩云</option>
+                            <option value="方正舒体">方正舒体</option>
+                            <option value="方正姚体">方正姚体</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">字体大小</label>
+                        <div class="layui-input-inline">
+                            <div id="slideTest6" style="margin-top: 18px"></div>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">旋转角度</label>
+                        <div class="layui-input-inline">
+                            <div id="slideTest8" style="margin-top: 18px"></div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="tab-wrap" style="padding: 10px 20px;margin-top: 50px;width: 72%;">
+            <h3 class="tab-wrap-square">留言评论</h3>
+
+            <div th:replace="onlineutils/linux :: messageBox"></div>
+            <h2 class="reply-all-head">所有回复</h2>
+            <div th:replace="onlineutils/linux :: comment"></div>
+            <div th:if="${pageTotal != 0}" class="layui-btn-container" style="margin-top: 20px;">
+                <a th:href="@{/util/watermark(page=${page-1},bindId=${bindId})}" th:class="${page == 1 ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-left"></i></a>
+                <a th:href="@{/util/watermark(page=${num},bindId=${bindId})}" th:class="${num == page ? 'layui-btn layui-btn-normal':'layui-btn'}" th:each="num : ${pageNumList}" th:text="${num}"></a>
+                <a th:href="@{/util/watermark(page=${page+1},bindId=${bindId})}" th:class="${page == pageTotal ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://www.sunyuchao.com/static/js/heart.js"></script>
+<script src="https://www.sunyuchao.com/static/layui/layui.js"></script>
+    <script src="https://www.sunyuchao.com/static/js/jquery3.3.1.min.js"></script>
+<script src="https://www.sunyuchao.com/static/js/reply.js" ></script>
+
+    <script src="https://www.sunyuchao.com/static/js/common.js"></script>
+<!--子回复模板-->
+<script type="text/template" id="childMsg">
+    <div class="msg-history">
+        <div class="mh-left">
+            <img class="radius" src="{avatar}" width="40" height="40">
+        </div>
+        <div class="mh-right">
+            <input type="hidden" class="userId" value="{userId}">
+            <p>
+                        <span style="float: left;"><span><a class="comment" href="javascript:;">{commentUsername}</a></span> 回复  <span>
+                            <a href="javascript:;" class="commented">{commentedUsername}</a></span></span>
+                <span style="float: right;" class="timeago" datetime="{time}"></span>
+            </p>
+            <p class="reply-content">
+                {content}
+            </p>
+            <p class="operate">
+                <span class="muted"> <a onclick="openChildReply(this)" href="javascript:;">回复</a></span>
+            </p>
+        </div>
+        <hr>
+    </div>
+    <div class="layui-clear"></div>
+</script>
+<!--1级回复模板-->
+<script type="text/template" id="FirstMsg">
+    <li class="item">
+        <div class="item-left">
+            <img class="radius" src="{avatar}" width="50" height="50">
+        </div>
+        <div class="item-right">
+            <p>
+                <span style="float: left;"><a href="javascript:;" class="floor">{commentUsername}</a></span>
+                <span style="float: right;" class="timeago" datetime="{time}"></span>
+            </p>
+            <p class="reply-content">
+                {content}
+            </p>
+            <p class="operate">
+                <span class="muted"> <a class="show" onclick="show(this)" href="javascript:;">展开</a>(<span>0</span>)</span>
+                <span class="muted"> <a onclick="openReply(this)" href="javascript:;">回复</a></span>
+                <span class="muted"> <a href="#"><i class="layui-icon layui-icon-praise"></i>17</a></span>
+                <span class="muted"> <a href="#"><i class="layui-icon layui-icon-tread"></i>17</a></span>
+            </p>
+            <div class="msg-content">
+
+            </div>
+            <div class="item-child-smbx">
+                <input type="hidden" class="receiverUserId" value="{commentId}">
+                回复 <span class="receiver">{commentUsernameCopy}</span>
+                <div contenteditable="true" class="layui-textarea" placeholder=""></div>
+                <div class="smb-r-bottom">
+                    <a onclick="loadFace(this)" href="javascript:;"><img src="/layui/images/face/1.gif"></a>
+                    <div class="face-frame"></div>
+                    <button onclick="saveMsg(this)" class="layui-btn layui-btn-normal" style="float: right;margin-right: 8px;">留言</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="layui-clear"></div>
+    </li>
+</script>
+
+<script th:inline="javascript">
+    var currentUser=[[${session.loginUser}]];
+    var currentUserId;
+    if(currentUser != null){
+        currentUserId=currentUser.id;
+    }
+</script>
+<script>
+    /**
+     * 留言给我
+     * */
+    function msgToMe(obj) {
+        var frameObj = $(obj).parent().prev();
+        var replyEntity={};
+        replyEntity.content = $(frameObj).html().replace(/&nbsp;/ig,'');;//回复内容
+        replyEntity.commentedUserId=1;//被回复者默认是我（生产中放到后台）
+        replyEntity.level = 1;
+        replyEntity.type = 14;
+        replyEntity.userId=currentUserId;
+        replyEntity.bindId=$("input[name=id]").val();
+        if($.trim(replyEntity.content).length == 0){
+            alert("请输入内容")
+            return false;
+        }
+        var retInfo={};
+        var flag=false;
+        $.ajax({
+            url:"/userComment/saveFirstMessage",
+            type:"POST",
+            data:replyEntity,
+            async:false,
+            success:function (e) {
+                if(e.success){
+                    retInfo=e.data;
+                    flag=true;
+                }else{
+                    layui.layer.alert(e.message);
+                }
+            },dataType: "json"
+        });
+        //校验
+        if(!flag){
+            return;
+        }
+        var html=$("#FirstMsg").html();
+        var arr = [];
+        arr.push(formatTemplate(retInfo, html));
+        $("#message-comment-body").prepend(arr.join(''));
+        $(frameObj).html("");//清空文本域
+        layui.timeago.render($('.timeago'));
+    }
+
+
+
+
+    /**
+     * 保存评论
+     * */
+    function saveMsg(obj,parentId){
+
+        //获取回复信息
+        var frameObj = $(obj).parent().prev();
+        var msg = $(frameObj).html().replace(/&nbsp;/ig,'');;//回复信息
+        var receiver = $(obj).parent().parent().children(".receiver");
+        var receiverUserId = $(obj).parent().parent().children(".receiverUserId");
+        var commented = $(receiver).html();
+        var commentedId = $(receiverUserId).val();
+        var replyEntity={};
+        replyEntity.userId=currentUserId;
+        replyEntity.commentedUserId=commentedId;
+        replyEntity.content=msg;
+        replyEntity.level=2;
+        replyEntity.type=14;
+        replyEntity.bindId=$("input[name=id]").val();
+        replyEntity.parentId=parentId;
+        var flag=false;
+        var retInfo={};
+        $.ajax({
+            url:"/userComment/saveChildrenMessage",
+            type:"POST",
+            data:replyEntity,
+            async:false,
+            success:function (e) {
+                if(e.success){
+                    retInfo=e.data;
+                    flag=true;
+                }else{
+                    layui.layer.alert(e.message);
+                }
+            },dataType:"json"
+        });
+        //校验
+        if(!flag){
+            return;
+        }
+        var prev = $(obj).parent().parent().prev();
+        if($(prev).is(":hidden")){
+            $(prev).show();
+        }
+
+        var html = $("#childMsg").html();
+        var arr = [];
+        arr.push(formatTemplate(retInfo, html));
+        $(prev).append(arr.join(''));//追加回复信息
+        var show = $(obj).parent().parent().prev().prev().find(".show");//展开按钮
+        $(show).html("关闭");
+
+        $(frameObj).html("");//清空回复框
+        layui.timeago.render($('.timeago'));
+    }
+</script>
+<script>
+    layui.config({base:'https://www.sunyuchao.com/static/layui/extends/'});
+    layui.use(['form','layer','timeago','colorpicker','slider','upload'], function(){
+        var form=layui.form,
+            $=layui.jquery,
+            upload=layui.upload,
+            colorpicker=layui.colorpicker,
+            slider=layui.slider,
+            timeago=layui.timeago,
+         layer=layui.layer;
+        timeago.render($('.timeago'));
+
+        form.on('select(font)',function (data) {
+            $("#mark_text").css("font-family",data.value);
+        });
+
+        $("#text").bind("input propertychange", function() {
+                $("#mark_text").html($(this).val());
+        });
+        $("#italic").click(function () {
+            $("#mark_text").css("font-style","italic");
+        });
+        $("#bold").click(function () {
+            $("#mark_text").css("font-weight","bold");
+        });
+
+        $("#logoUpload").click(function () {
+            layer.alert("该功能暂未开放。。。")
+        });
+        var dragging = false;
+        var iX, iY;
+        $("#mark_text").mousedown(function(e) {
+            dragging = true;
+            iX = e.clientX - this.offsetLeft;
+            iY = e.clientY - this.offsetTop;
+            this.setCapture && this.setCapture();
+            return false;
+        });
+
+        document.onmousemove = function(e) {
+
+            //图片左边边距
+            var leftMin = $("#box").width() / 2 - $("#origin_image").width()/2;
+            var rightMax = $("#box").width() / 2 + $("#origin_image").width()/2 - $("#mark_text").width();
+            var topMax = $('#box').offset().top + $("#box").height() ;//距离顶部位置
+
+            if (dragging) {
+                var e = e || window.event;
+                var oX = e.clientX - iX;
+                var oY = e.clientY - iY;
+                //下面代码限制水印只能在图片内部移动
+                if(oX < leftMin){
+                    oX = leftMin;
+                }
+                if(oX > rightMax){
+                    oX = rightMax;
+                }
+                if(oY < 0){
+                    oY = 0 ;
+                }
+                if(oY > $("#box").height() - $("#mark_text").height() ){
+                    oY =  $("#box").height()- $("#mark_text").height();
+                }
+                $("#mark_text").css({
+                    "left": oX + "px",
+                    "top": oY + "px"
+                });
+
+                return false;
+            }
+        };
+
+        //释放鼠标的时候
+        $(document).mouseup(function(e) {
+            dragging = false;
+            $("#mark_text").releaseCapture();
+            e.cancelBubble = true;
+        })
+
+
+
+        upload.render({
+            elem: '#uploadOrigin'
+            ,url: '/util/watermark/uploadOrigin'
+            ,accept:"images"
+            ,exts:'ico|jpg|png|gif|jpeg|bmp|webp'
+            ,before: function(obj){
+                obj.preview(function(index, file, result){
+                    $('#origin_image').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }else{
+                    $('#origin_image').attr('src', res.data.src); //图片链接（base64）
+                    $('#origin_image').show();
+                    $('#mark_text').show();
+                    $('#download').removeAttr("disabled");
+                    $('#download').removeClass("layui-btn-disabled");
+                }
+                //上传成功
+            }
+        });
+        //文本大小
+        slider.render({
+            elem: '#slideTest6'
+            ,min: 8
+            ,max: 80
+            ,value:20
+            ,setTips: function(value){ //自定义提示文本
+                $("#mark_text").css("font-size",value+"px");
+                return value + 'px';
+            }
+        });
+
+        var degree = 0;
+        $("#slideTest8").click(function () {
+            layer.msg("旋转角度暂时会导致位置偏移，正在修复中");
+        });
+        //旋转角度
+         slider.render({
+            elem: '#slideTest8'
+            ,min: 0
+            ,max: 360
+            ,disabled:true
+            ,setTips: function(value){ //自定义提示文本
+                $("#mark_text").css("transform","rotate("+value+"deg)");
+                degree = value;
+                return value + '°';
+            }
+        });
+
+
+        //透明度
+        slider.render({
+            elem: '#slideTest7'
+            ,min: 1
+            ,max: 10
+            ,value:10
+            ,setTips: function(value){ //自定义提示文本
+                $("#mark_text").css("opacity",value/10);
+                return value/10 + 'f';
+            }
+        });
+
+        colorpicker.render({
+            elem: '#test9'
+            ,color: '#9d8a0e'
+            ,predefine: true // 开启预定义颜色
+            ,colors: ['#ff8c00','#00ced1','#9d8a0e'] //自定义预定义颜色项
+            ,change: function(color){
+                //给当前页面头部和左侧设置主题色
+                $('#mark_text').css('color', color);
+            }
+        });
+
+        /**
+         * 下载水印图
+         * */
+        $("#download").click(function () {
+
+            var url = $("#origin_image").attr("src");
+            var text = $("#text").val();//文本
+            var fontFamily = $("select[name=fontfamily]").val();
+            var fontWeight = $("#mark_text").css("font-weight");
+            var fontStyle = $("#mark_text").css("font-style");
+            var color = $("#mark_text").css("color");
+            var fontSize = $("#mark_text").css("font-size").replace("px","");
+            var opacity = $("#mark_text").css("opacity");
+            //var top = parseInt($("#mark_text").css("top").replace("px","")) + parseInt($("#mark_text").height());//Y坐标
+            var top = $("#mark_text").css("top").replace("px","");//Y坐标
+            var left = parseInt($("#mark_text").css("left").replace("px","")) - (Math.round($("#box").width()/2) - Math.round($("#origin_image").width()/2));
+
+            var centerX= parseInt(left) + Math.round($("#mark_text").height() / 2);//中心点
+            var centerY= parseInt(top) + Math.round($("#mark_text").height() / 2);//中心点
+            window.open("/util/watermark/downloadMarkTextPicture?url="+url+"&text="+text+"&fontFamily="+fontFamily
+            +"&fontWeight="+fontWeight+"&fontStyle="+fontStyle+"&color="+color+"&fontSize="+fontSize
+                +"&positionY="+top+"&positionX="+left+"&opacity="+opacity
+            );
+        });
+    });
+</script>
+<script src="/login.js"></script>
+</body>
+</html>

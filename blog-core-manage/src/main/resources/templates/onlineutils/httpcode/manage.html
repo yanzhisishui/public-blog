@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link th:href="@{/layui/css/layui.css}" href="../../../static/layui/css/layui.css" rel="stylesheet"/>
+</head>
+<body>
+
+
+<table class="layui-hide" id="httpCode" lay-filter="httpCode"></table>
+
+<script type="text/html" id="topBar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-normal" lay-event="add">添加</button>
+    </div>
+</script>
+
+<script type="text/html" id="rightBar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+<script src="../../../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+
+<script>
+    layui.use(['table','layer'], function(){
+        var table = layui.table,
+            $=layui.jquery,
+            layer=layui.layer;
+
+
+        table.render({
+            elem: '#httpCode'
+            ,url:'/util/httpStatusCode/queryListPage'
+            ,toolbar: '#topBar'
+            ,title: ''
+            ,cols: [  [
+                {type: 'checkbox', fixed: 'left'}
+                ,{field:'id', title:'ID', width:80, fixed: 'left'}
+                ,{field:'code', title:'状态码', width:120}
+                ,{field:'flag', title:'标志', width:180}
+                ,{field:'description', title:'描述', width:420}
+                ,{fixed: 'right', title:'操作', toolbar: '#rightBar', width:250}
+            ]  ]
+            ,page: true
+        });
+
+        //头工具栏事件
+        table.on('toolbar(httpCode)', function(obj){
+
+            switch(obj.event){
+                case 'add':
+                    layer.open({
+                        type: 2,
+                        area:['40%','70%'],
+                        title: "添加",
+                        content: '/util/httpStatusCode/add'
+                    });
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('tool(httpCode)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('真的删除吗',{icon:3,title:"提示"}, function(index){
+                    $.ajax({
+                        url:'/util/httpStatusCode/delete',
+                        type:'POST',
+                        data:{"id":data.id},
+                        success:function (e) {
+                            if(e.success){
+                                obj.del();
+                                layer.close(index);
+                            }else{
+                                alert(e.message);
+                            }
+                        },dataType:"json"
+                    });
+
+                });
+            } else if(obj.event === 'edit'){
+                layer.open({
+                    type: 2,
+                    area:['40%','70%'],
+                    title: "编辑",
+                    content: '/util/httpStatusCode/edit?id='+data.id
+                });
+            }
+        });
+
+
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>房贷分期还款计算</title>
+    <link href="https://www.sunyuchao.com/static/layui/css/layui.css"  rel="stylesheet">
+
+    <link href="https://www.sunyuchao.com/static/css/fontawesome4.7.0/css/font-awesome.css"  rel="stylesheet">
+    <link href="https://www.sunyuchao.com/static/css/utilscommon.css" rel="stylesheet">
+    <link href="https://www.sunyuchao.com/static/css/common.css" rel="stylesheet">
+    <link href="https://www.sunyuchao.com/static/css/reply.css" rel="stylesheet" >
+
+    <script th:src="${iconfontUrl}"></script>
+
+    <style>
+        #result{height: 50px;line-height: 50px;width: 360px;background-color: white;padding: 0 20px;}
+        .tab-wrap{background-color: white;padding: 3px 10px;margin-top: 10px;}
+        .tab-wrap .tab-wrap-square{padding: 5px;margin-bottom: 10px;position: relative;border-bottom: 1px solid #e7e7e7;
+            padding-bottom: 10px;padding-top: 12px;}
+        .tab-wrap .tab-wrap-square::after {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2.5px!important;
+            width: 100px;
+            background-color: #51aded;
+            content: '';
+            transition:width 2s;
+            -moz-transition:width 2s; /* Firefox 4 */
+            -webkit-transition:width 2s; /* Safari and Chrome */
+            -o-transition:width 2s; /* Opera */
+        }
+        /*鼠标悬停div修改子元素样式*/
+        .tab-wrap:hover .tab-wrap-square:first-child::after{
+            width: 400px;
+        }
+
+        .tab-wrap .reply-all-head{font-size: 18px;font-weight: bold;}
+        /*手机*/
+        @media screen and (max-width: 980px) {
+            .smb-right{width:88%;}
+        }
+    </style>
+</head>
+<body>
+<!--搜索-->
+<div th:replace="index :: search"></div>
+<!--右下角固定-->
+<div th:replace="index :: permanent"></div>
+<div th:replace="index :: top"></div>
+<div class="content">
+    <h1 class="square">
+        <span class="f-right">君子求诸己，小人求诸人 —— 孔子</span>
+    </h1>
+    <input type="hidden" th:value="${bindId}" name="id">
+    <div class="left">
+        <h2>房贷分期还款计算</h2>
+        <hr>
+        <h3>前言：最近考虑到买房子的事情对于贷款，利率，利息一概不懂......毕竟我和朋友借钱都是没有利息的，大致了解了下房贷的相关计算方法。做了个小工具计算分期还款的金额（虽然我这个穷打工仔没钱买，
+            但是也到了见女朋友父母的时间了，加油吧，打工人......）</h3>
+        <hr>
+        <form class="layui-form" style="margin-top: 20px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">贷款总额</label>
+                <div class="layui-input-inline" style="width: 200px;">
+                    <input type="text" name="loanTotal"  placeholder="600000" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">元</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">贷款期限</label>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <select name="year" lay-filter="year" lay-verify="required"></select>
+                </div>
+                <div class="layui-form-mid layui-word-aux">（年）</div>
+                <div class="layui-form-mid layui-word-aux">总共 <span id="num">360</span> 期</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">购房性质</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="houseType" lay-filter="houseType" value="1" title="一套房" checked>
+                    <input type="radio" name="houseType" lay-filter="houseType" value="2" disabled title="二套房">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">贷款年利率</label>
+                <div class="layui-input-inline" style="width: 100px;">
+                    <input type="text" name="annualRate"  placeholder="3.25" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">（%） 公积金贷款和非公积金贷款利率不同</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">还款方式</label>
+                <div class="layui-input-inline" style="width: 600px;">
+                    <input type="radio" name="type" value="1" title="等额本息" checked>
+                    <input type="radio" name="type" value="2" title="等额本金">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-normal" lay-submit lay-filter="go">计算</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+
+        <div style="margin-top: 50px;">
+           <div style="float: left;">
+               <h3>累计支付利息：<span id="totalInterest"></span></h3>
+           </div>
+           <div style="float: right;">
+               <h3>累计还款总额：<span id="totalAmount"></span></h3>
+           </div>
+            <div class="layui-clear"></div>
+        </div>
+
+        <table class="layui-table" lay-skin="line">
+            <colgroup>
+                <col width="200">
+                <col>
+                <col>
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>期数</th>
+                <th>月供</th>
+                <th>本金</th>
+                <th>利息</th>
+            </tr>
+            </thead>
+        </table>
+        <div style="overflow-y: scroll;max-height: 400px;margin-top: -10px;">
+            <table class="layui-table" lay-skin="line">
+
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-wrap" style="padding: 10px 20px;">
+            <h3 class="tab-wrap-square">留言评论</h3>
+
+            <div th:replace="onlineutils/linux :: messageBox"></div>
+            <h2 class="reply-all-head">所有回复</h2>
+            <div th:replace="onlineutils/linux :: comment"></div>
+            <div th:if="${pageTotal != 0}" class="layui-btn-container" style="margin-top: 20px;">
+                <a th:href="@{/util/numMoneyConvert(page=${page-1},bindId=${bindId})}" th:class="${page == 1 ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-left"></i></a>
+                <a th:href="@{/util/numMoneyConvert(page=${num},bindId=${bindId})}" th:class="${num == page ? 'layui-btn layui-btn-normal':'layui-btn'}" th:each="num : ${pageNumList}" th:text="${num}"></a>
+                <a th:href="@{/util/numMoneyConvert(page=${page+1},bindId=${bindId})}" th:class="${page == pageTotal ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-right"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="right">
+        <div style="width: 100%;height: 200px;background-color: #cdd;margin-top: 20px;">
+
+        </div>
+        <div style="width: 100%;height: 200px;background-color: #cdf;margin-top: 20px;">
+
+        </div>
+        <div style="width: 100%;height: 200px;background-color: #dfc;margin-top: 20px;">
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://www.sunyuchao.com/static/js/heart.js" ></script>
+<script src="https://www.sunyuchao.com/static/layui/layui.js" ></script>
+<script src="https://www.sunyuchao.com/static/js/clipboard.min.js"></script>
+    <script src="https://www.sunyuchao.com/static/js/jquery3.3.1.min.js"></script>
+<script src="https://www.sunyuchao.com/static/js/reply.js"></script>
+
+    <script src="https://www.sunyuchao.com/static/js/common.js"></script>
+<!--子回复模板-->
+<script type="text/template" id="childMsg">
+    <div class="msg-history">
+        <div class="mh-left">
+            <img class="radius" src="{avatar}" width="40" height="40">
+        </div>
+        <div class="mh-right">
+            <input type="hidden" class="userId" value="{userId}">
+            <p>
+                        <span style="float: left;"><span><a class="comment" href="javascript:;">{commentUsername}</a></span> 回复  <span>
+                            <a href="javascript:;" class="commented">{commentedUsername}</a></span></span>
+                <span style="float: right;" class="timeago" datetime="{time}"></span>
+            </p>
+            <p class="reply-content">
+                {content}
+            </p>
+            <p class="operate">
+                <span class="muted"> <a onclick="openChildReply(this)" href="javascript:;">回复</a></span>
+            </p>
+        </div>
+        <hr>
+    </div>
+    <div class="layui-clear"></div>
+</script>
+<!--1级回复模板-->
+<script type="text/template" id="FirstMsg">
+    <li class="item">
+        <div class="item-left">
+            <img class="radius" src="{avatar}" width="50" height="50">
+        </div>
+        <div class="item-right">
+            <p>
+                <span style="float: left;"><a href="javascript:;" class="floor">{commentUsername}</a></span>
+                <span style="float: right;" class="timeago" datetime="{time}"></span>
+            </p>
+            <p class="reply-content">
+                {content}
+            </p>
+            <p class="operate">
+                <span class="muted"> <a class="show" onclick="show(this)" href="javascript:;">展开</a>(<span>0</span>)</span>
+                <span class="muted"> <a onclick="openReply(this)" href="javascript:;">回复</a></span>
+                <span class="muted"> <a href="#"><i class="layui-icon layui-icon-praise"></i>17</a></span>
+                <span class="muted"> <a href="#"><i class="layui-icon layui-icon-tread"></i>17</a></span>
+            </p>
+            <div class="msg-content">
+
+            </div>
+            <div class="item-child-smbx">
+                <input type="hidden" class="receiverUserId" value="{commentId}">
+                回复 <span class="receiver">{commentUsernameCopy}</span>
+                <div contenteditable="true" class="layui-textarea" placeholder=""></div>
+                <div class="smb-r-bottom">
+                    <a onclick="loadFace(this)" href="javascript:;"><img src="/layui/images/face/1.gif"></a>
+                    <div class="face-frame"></div>
+                    <button onclick="saveMsg(this)" class="layui-btn layui-btn-normal" style="float: right;margin-right: 8px;">留言</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="layui-clear"></div>
+    </li>
+</script>
+
+<script th:inline="javascript">
+    var currentUser=[[${session.loginUser}]];
+    var currentUserId;
+    if(currentUser != null){
+        currentUserId=currentUser.id;
+    }
+</script>
+<script>
+    /**
+     * 留言给我
+     * */
+    function msgToMe(obj) {
+        var frameObj = $(obj).parent().prev();
+        var replyEntity={};
+        replyEntity.content = $(frameObj).html().replace(/&nbsp;/ig,'');;//回复内容
+        replyEntity.commentedUserId=1;//被回复者默认是我（生产中放到后台）
+        replyEntity.level = 1;
+        replyEntity.type = 16;
+        replyEntity.userId=currentUserId;
+        replyEntity.bindId=$("input[name=id]").val();
+        if($.trim(replyEntity.content).length == 0){
+            alert("请输入内容")
+            return false;
+        }
+        var retInfo={};
+        var flag=false;
+        $.ajax({
+            url:"/userComment/saveFirstMessage",
+            type:"POST",
+            data:replyEntity,
+            async:false,
+            success:function (e) {
+                if(e.success){
+                    retInfo=e.data;
+                    flag=true;
+                }else{
+                    layui.layer.alert(e.message);
+                }
+            },dataType: "json"
+        });
+        //校验
+        if(!flag){
+            return;
+        }
+        var html=$("#FirstMsg").html();
+        var arr = [];
+        arr.push(formatTemplate(retInfo, html));
+        $("#message-comment-body").prepend(arr.join(''));
+        $(frameObj).html("");//清空文本域
+        layui.timeago.render($('.timeago'));
+    }
+
+
+
+
+    /**
+     * 保存评论
+     * */
+    function saveMsg(obj,parentId){
+
+        //获取回复信息
+        var frameObj = $(obj).parent().prev();
+        var msg = $(frameObj).html().replace(/&nbsp;/ig,'');;//回复信息
+        var receiver = $(obj).parent().parent().children(".receiver");
+        var receiverUserId = $(obj).parent().parent().children(".receiverUserId");
+        var commented = $(receiver).html();
+        var commentedId = $(receiverUserId).val();
+        var replyEntity={};
+        replyEntity.userId=currentUserId;
+        replyEntity.commentedUserId=commentedId;
+        replyEntity.content=msg;
+        replyEntity.level=2;
+        replyEntity.type=16;
+        replyEntity.bindId=$("input[name=id]").val();
+        replyEntity.parentId=parentId;
+        var flag=false;
+        var retInfo={};
+        $.ajax({
+            url:"/userComment/saveChildrenMessage",
+            type:"POST",
+            data:replyEntity,
+            async:false,
+            success:function (e) {
+                if(e.success){
+                    retInfo=e.data;
+                    flag=true;
+                }else{
+                    layui.layer.alert(e.message);
+                }
+            },dataType:"json"
+        });
+        //校验
+        if(!flag){
+            return;
+        }
+        var prev = $(obj).parent().parent().prev();
+        if($(prev).is(":hidden")){
+            $(prev).show();
+        }
+
+        var html = $("#childMsg").html();
+        var arr = [];
+        arr.push(formatTemplate(retInfo, html));
+        $(prev).append(arr.join(''));//追加回复信息
+        var show = $(obj).parent().parent().prev().prev().find(".show");//展开按钮
+        $(show).html("关闭");
+
+        $(frameObj).html("");//清空回复框
+        layui.timeago.render($('.timeago'));
+    }
+</script>
+<script>
+    layui.config({base:'https://www.sunyuchao.com/static/layui/extends/'});
+    layui.use(['layer','form','timeago'], function(){
+        var form=layui.form,
+            $=layui.jquery,
+            timeago=layui.timeago,
+            layer=layui.layer;
+        timeago.render($('.timeago'));
+        //必须要初始化 第一种初始化
+        var clipboard = new ClipboardJS('#copy');
+        clipboard.on('success', function(e) {
+            layer.msg("成功复制到剪切板")
+        });
+        clipboard.on('error', function(e) {
+            layer.msg("复制失败")
+        });
+
+        for(var i = 5; i <= 50 ; i++){
+           if(i == 30){
+               $("select[name=year]").append("<option selected='selected' value='"+i+"'>"+i+"</option>");
+           } else {
+               $("select[name=year]").append("<option value='"+i+"'>"+i+"</option>");
+           }
+        }
+        form.render('select');
+
+        //选择月份出现对应的天数
+        form.on('select(year)', function (data) {
+            $("#num").html(data.value * 12);
+        });
+
+        form.on('submit(go)', function (data) {
+            $("tbody").empty();
+            $.ajax({
+                url:"/util/mortgage/loan/calc",
+                type:"GET",
+                data:data.field,
+                async:false,
+                success:function (e) {
+                    if(e.success){
+                        $("#totalInterest").html(e.data.interestTotal);
+                        $("#totalAmount").html(e.data.totalAmount);
+                        let itemList = e.data.itemList;
+                        for(var i = 0;i<itemList.length;i++){
+                            $("tbody").append("<tr><td>"+itemList[i].index+" 期</td><td>"+itemList[i].monthTotal+"</td><td>"+itemList[i].capital+"</td><td>"+itemList[i].interest+"</td></tr>");
+                        }
+                    }else{
+                        layer.alert(e.message);
+                    }
+                },dataType: "json"
+            });
+            return false;
+        });
+
+    });
+</script>
+<script src="/login.js"></script>
+</body>
+</html>
