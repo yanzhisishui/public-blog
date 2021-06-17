@@ -4,11 +4,11 @@ server:
 
 aliyun:
   oss:
-    endpoint: xxx
+    endpoint: xxx #自己申请
     access_key_id: xxx
     access_key_secret: xxx
     buck_name: xxx
     url_prefix: xxx
 spring:
   profiles:
-    active: prd
+    active: dev

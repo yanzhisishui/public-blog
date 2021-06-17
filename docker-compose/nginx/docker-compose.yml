@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx:1.17.9
+    container_name: nginx
+    volumes:
+      - ./conf:/etc/nginx:ro
+      - ./cert:/cert
+      - ./html:/usr/share/nginx/html
+      - ./logs:/var/log/nginx
+      - /docker/video:/files/video
+    ports:
+      - 80:80
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+    network_mode: host
+    
+

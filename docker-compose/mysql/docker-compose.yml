@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  #服务名称
+  mysql:
+    #容器名称
+    container_name: mysql
+    #镜像名称
+    image: mysql:5.7.27
+    #总是重启后启动
+    restart: always
+    #端口映射
+    ports:
+      - 3306:3306
+    #挂载
+    volumes:
+      - ./my.cnf:/etc/mysql/my.cnf:ro
+      - ./data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    #环境变量
+    

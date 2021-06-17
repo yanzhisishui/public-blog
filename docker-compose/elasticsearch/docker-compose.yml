@@ -1,0 +1,22 @@
+
+version: '3.7'
+services:
+  es01:
+    image: elasticsearch:7.6.1
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=es01
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./data:/usr/share/elasticsearch/data
+      - ./ik:/usr/share/elasticsearch/plugins/ik
+    ports:
+      - 9200:9200
+     

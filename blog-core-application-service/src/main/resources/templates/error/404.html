@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>资源未找到</title>
+    <link rel="stylesheet" href="https://www.sunyuchao.com/static/layui/css/layui.css">
+    <link rel="stylesheet" href="https://www.sunyuchao.com/static/css/common.css">
+    <link rel="stylesheet" href="https://www.sunyuchao.com/static/css/fontawesome4.7.0/css/font-awesome.css">
+    <script th:src="${iconfontUrl}"></script>
+    <style>
+        #tip{margin: 0 auto;width: 420px;}
+        #tip i{font-size: 420px;color: blueviolet;}
+        #tip h2{font-weight: bold;text-align: center}
+        #tip p{color: #999;font-size: 15px;text-align: center;margin-top: 20px;}
+        #tip p a{color: blue;}
+    </style>
+</head>
+<body>
+<!--搜索-->
+<div class="search">
+    <form>
+        <input type="text" placeholder="搜索...">
+        <button id="go" type="submit"></button>
+    </form>
+</div>
+<!--右下角固定-->
+<div id="permanent">
+    <ul>
+        <li id="toTop"><a href="javascript:;"><i class="layui-icon layui-icon-top"></i></a></li>
+        <li id="feedback"><a href="#"><i class="layui-icon layui-icon-edit"></i></a></li>
+        <li><a href="tencent://message/?uin=1481232419&Site=&Menu=yes"><i style="color: blueviolet;" class="layui-icon layui-icon-login-qq"></i></a></li>
+        <li><a href="#"><i style="color: yellowgreen" class="layui-icon layui-icon-login-wechat"></i></a></li>
+    </ul>
+</div>
+    <div th:replace="notice :: top"></div>
+    <div id="tip">
+        <i class="layui-icon layui-icon-404"></i>
+        <h2>哎呀，网页不小心走丢了......</h2>
+        <p>您访问的网址可能有误或者该页面已被删除不存在了</p>
+        <p><a href="/">返回博客首页</a></p>
+    </div>
+</body>
+<script src="https://www.sunyuchao.com/static/js/common.js"></script>
+</html>

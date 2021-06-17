@@ -1,0 +1,29 @@
+.content{width: 62%;margin: 0 auto;margin-top: 20px;}
+.content .square{padding: 5px;margin:0 auto;margin-bottom: 10px;position: relative;border-bottom: 1px solid #ccc;
+    color:#526163;font-weight: bold;font-size: 15px;overflow: hidden;padding-bottom: 10px;}
+.content .square::after {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2.5px!important;
+    width: 100px;
+    background-color: #51aded;
+    content: '';
+    transition:width 2s;
+    -moz-transition:width 2s; /* Firefox 4 */
+    -webkit-transition:width 2s; /* Safari and Chrome */
+    -o-transition:width 2s; /* Opera */
+}
+/*鼠标悬停div修改子元素样式*/
+.content:hover .square:first-child::after{
+    width: 600px;
+}
+
+.left{width: 72%;float: left;}
+.right{width: 26%;float: right;}
+/*小屏幕 1366 x 768*/
+@media screen and (max-width: 1366px) {
+    .content{
+        width: 88%;
+    }
+}

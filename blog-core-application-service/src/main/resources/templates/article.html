@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${article.title}"></title>
+    <meta name="Description" content="孙玉超个人博客是一个分享、研究Java技术的自媒体博客。Java技术栈的学习之路，我和你一起行走！" />
+    <link href="https://www.sunyuchao.com/static/css/fontawesome4.7.0/css/font-awesome.css"  rel="stylesheet">
+    <link href="https://www.sunyuchao.com/static/layui/css/layui.css" rel="stylesheet" >
+    <script th:src="${iconfontUrl}"></script>
+    <link rel="stylesheet" href="https://www.sunyuchao.com/static/css/common.css" >
+    <link href="https://www.sunyuchao.com/static/css/reply.css" rel="stylesheet" >
+    <style>
+        .content{width: 62%;margin: 0 auto;margin-top: 20px;}
+        .content .content-left{float: left;width: 72%;background-color: white;}
+        .content .content-left .separator{margin: 0 auto;width: 100%;height: 30px;background: rgb(244,244,244);}
+        .content .content-left .article-body{margin: 0 auto;width: 95%;}
+        .content .content-left .article-title{margin-top: 10px;font-size: 22px;font-weight: bold;}
+
+        .content-left .square{padding: 5px;margin-bottom: 10px;position: relative;border-bottom: 1px solid #e7e7e7;
+            padding-bottom: 10px;padding-top: 12px;}
+        .donate{font-size: 20px;font-weight: 600;width: 60%;margin: 0 auto;margin-top: 20px;}
+        .other-article{margin-top: 20px;padding-bottom: 20px;}
+        .content-left .square::after {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2.5px!important;
+            width: 100px;
+            background-color: #51aded;
+            content: '';
+            transition:width 2s;
+            -moz-transition:width 2s; /* Firefox 4 */
+            -webkit-transition:width 2s; /* Safari and Chrome */
+            -o-transition:width 2s; /* Opera */
+        }
+        /*鼠标悬停div修改子元素样式*/
+        .content-left >div:hover .square:first-child::after{
+            width: 400px;
+        }
+
+        .head{margin-top: 10px;font-size: 16px;color: #999;}
+        .head span, .head span a{font-size: 15px;color: #999;line-height: 24px;}
+        .head span i{font-size: 1.14em;}
+        .head .option-item{margin-left: 20px;}
+
+        .content .content-right{float: right;width: 27%;}
+
+        .content-right .right-card{background-color: white;margin-top: 20px;padding-bottom: 10px;}
+        .content-right .right-card:first-child{margin-top: 0;}
+        .content-right .flex{width: 96%;margin: 0 auto;}
+        .content-right .flex li{margin:3px;width: 31%;height: 80px;line-height: 80px;text-align: center; }
+        .content-right .flex li a{display: block;color: white;background-color: rgba(255,255,255,0.2);
+            transition: All 2s ease;
+            -webkit-transition: All 2s ease;
+            -moz-transition: All 2s ease;
+            -o-transition: All 2s ease;}
+        .content-right .flex li a:hover{
+        rgba(255,255,255,0.2)
+        -webkit-transform:rotate(360deg) ;
+            -moz-transform:rotate(360deg)  ;
+            -ms-transform:rotate(360deg)  ;
+            -o-transform: rotate(360deg) ;
+            transform: rotate(360deg) ;}
+
+        .content-right .square{padding: 5px;margin:0 auto;margin-bottom: 10px;position: relative;border-bottom: 1px solid #e7e7e7;
+            padding-bottom: 15px;width: 90%;padding-top: 12px;font-weight: bold;}
+        .content-right .square::after {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2.5px!important;
+            width: 100px;
+            background-color: #51aded;
+            content: '';
+            transition:width 1s;
+            -moz-transition:width 1s; /* Firefox 4 */
+            -webkit-transition:width 1s; /* Safari and Chrome */
+            -o-transition:width 1s; /* Opera */
+        }
+        /*最新公告*/
+
+        .notice li{padding: 8px 15px 6px 25px;border-radius: 4px;margin-top: 8px;margin-left: 10px;position: relative;width: 80%;transition: all .5s}
+        .notice li:hover{box-shadow: 0 0 10px blue;}
+        .notice li span{float: right;margin-right: 5px;}
+        .notice li a{display: inline-block;text-overflow:ellipsis;width: 65%;overflow: hidden;white-space:nowrap;}
+        .notice li:before {
+            position: absolute;
+            content: "";
+            width: 3px;
+            height: 3px;
+            background: #000;
+            border-radius: 50%;
+            left: 10px;
+            top: 17px;
+        }
+
+        /*鼠标悬停div修改子元素样式*/
+        .content-right > div:hover .square:first-child::after{
+            width: 200px;
+        }
+
+        /*图片点击*/
+        .enlargeImg_wrapper {display: none;position: fixed;z-index: 999;top: 0;right: 0;bottom: 0;left: 0;background-repeat: no-repeat;background-attachment: fixed;background-position: center;background-color: rgba(52, 52, 52, 0.8);background-size: 50%;
+        }
+        .enlargeImg{position: absolute;top: 40px;left: 120px;border-radius: 50%;}
+        .enlargeImg:hover {cursor: zoom-in;}
+        .zoomOut:hover {cursor: zoom-in;}
+        .enlargeImg_wrapper:hover {cursor: zoom-out;}
+
+        /**留言评论*/
+
+        .content-left .reply-all-head{font-size: 18px;font-weight: bold;}
+
+
+
+        .layui-code code{font-family: Arial, Helvetica, sans-serif;font-size: 15px;}
+        .article-text{overflow-y: auto;max-height: 900px;color: #333;font-size: 15px;line-height: 24px;}
+        #live2dcanvas{
+            pointer-events: auto !important;
+        }
+        .layui-table th{text-align: center !important;}
+
+
+        .mycard{padding-bottom: 0;position: relative;}
+        .mycard-fill{height: 80px;background-color: #00FFFF;}
+        .mycard-bottom{height: 140px;padding-top: 50px;}
+        .mycard-bottom h2{text-align: center;font-size: 18px;font-weight: 600;}
+        .mycard-bottom p{width: 85%;margin: 0 auto;margin-top: 10px;}
+        .myavatar{position: absolute;top: 40px;left: 120px;border-radius: 50%;}
+        /*小屏幕 1366 x 768*/
+        @media screen and (max-width: 1366px) {
+            .content {
+                width: 88%;
+            }
+
+        }
+
+        @media screen and (max-width: 980px) {
+
+            .new-reply .item .item-left .radius{width: 50px;height: 50px;}
+            .content-right .flex li{width: 30%;height: 65px;line-height: 65px;}
+            .enlargeImg{left:80px;}
+            .myavatar{width: 60px;height: 60px;left: 86px;top: 30px;}
+
+            .mycard-fill{height: 60px;}
+            .mycard-bottom{padding-top: 45px;}
+            .mycard-bottom h2{font-size: 16px;font-weight: 600;}
+            .mycard-bottom p{font-size: 12px;}
+            .content-right .right-card{max-height: 220px;overflow: hidden;}
+        }
+
+    </style>
+</head>
+<body>
+
+    <!--搜索-->
+    <div th:replace="index :: search"></div>
+    <!--右下角固定-->
+    <div th:replace="index :: permanent"></div>
+
+   <div th:replace="notice :: top"></div>
+
+    <div class="content">
+        <div class="content-left">
+            <div>
+                <div class="auto-93">
+                    <h3 class="square">
+                        <span style="float: right;font-size: 14px;">您现在的位置是：首页 > 文章 > <span style="font-weight: 600;color: #d2f;" th:text="${article.title}"></span></span>
+                        网站文章</h3>
+                </div>
+
+                <div class="article-body">
+                    <input type="hidden" th:value="${article.id}" name="id">
+                    <h2 class="article-title" th:text="${article.title}"></h2>
+                    <p class="head">
+                        <img th:src="${card.avatar}" width="30" height="30" style="border-radius: 50%;">
+                        <span><a href="">孙玉超</a></span>
+                        <span class="option-item"><i class="layui-icon layui-icon-date"></i> [[${#dates.format(article.dateInsert, 'yyyy-MM-dd HH:mm:ss')}]]</span>
+                        <span class="option-item"><i class="layui-icon layui-icon-reply-fill"></i> [[${article.commentCount}]] 评论</span>
+                        <span class="option-item"><i class="layui-icon layui-icon-file"></i> [[${article.browser}]] 浏览</span>
+                        <span class="option-item"><i class="layui-icon layui-icon-star"></i> [[${article.collectionCount}]] 收藏</span>
+                        <span class="option-item">
+                            <a th:if="${articlePraised}" th:praised="yes" style="color: red;" id="praise" href="javascript:;"><i class="layui-icon layui-icon-praise"></i><span th:text="${article.praise}">&nbsp;201</span> 赞</a>
+                            <a th:if="${!articlePraised}" th:praised="no" id="praise" href="javascript:;"><i class="layui-icon layui-icon-praise"></i><span th:text="${article.praise}">&nbsp;201</span> 赞</a>
+                        </span>
+                    </p>
+                    <hr>
+                    <div class="article-text" th:utext="${article.content}"></div>
+                    <div th:if="${isMobile}" style="text-align: center"><a href="javascript:;" id="readMore">下滑阅读全文 <i class="layui-icon layui-icon-down"></i></a></div>
+                    <h3 style="margin-top: 20px;"> 转载请注明出处：<a href="#">转载请注明出处</a></h3>
+                    <!--<div class="auto-80">
+                        <h2 class="donate">写文章不容易，如果这边文章对您有帮助。可以打赏激励一下作者！ ~(@^_^@)~</h2>
+                        <img class="f-left" src="/images/money.png" width="227" height="227">
+                        <img class="f-right" src="/images/money.png" width="227" height="227">
+                        <div class="layui-clear"></div>
+                    </div>-->
+                    <div class="other-article">
+                        <span>上一篇 : <a th:href="@{/article/__${pre.id}__}" th:text="${pre.title}"></a></span>
+                        <span style="float: right;">下一篇 : <a th:href="@{/article/__${next.id}__}" th:text="${next.title}"></a></span>
+                    </div>
+                </div>
+            </div>
+            <div class="separator"></div>
+            <div class="auto-95" style="background: white;">
+                <h3 class="square">留言评论</h3>
+
+                <div th:replace="message :: messageBox"></div>
+                <h2 class="reply-all-head">所有回复</h2>
+                <div th:replace="message :: comment"></div>
+                <div th:if="${pageTotal != 0}" class="layui-btn-container" style="margin-top: 20px;">
+                    <a th:href="@{/article/__${article.id}__(page=${page-1})}" th:class="${page == 1 ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-left"></i></a>
+                    <a th:href="@{/article/__${article.id}__(page=${num})}" th:class="${num == page ? 'layui-btn layui-btn-normal':'layui-btn'}" th:each="num : ${pageNumList}" th:text="${num}"></a>
+                    <a th:href="@{/article/__${article.id}__(page=${page+1})}" th:class="${page == pageTotal ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="content-right">
+            <div class="right-card mycard">
+                <img class="myavatar zoomOut" th:src="${card.avatar}" width="80" height="80">
+                <div class="mycard-fill"></div>
+                <div class="mycard-bottom">
+                    <h2 th:text="${card.nickname}">暮色妖娆</h2>
+                    <p th:text="${card.introduction}"></p>
+                </div>
+
+            </div>
+            <div class="right-card">
+                <h3 class="square">在线工具</h3>
+                <div>
+                    <ul class="notice">
+                        <li th:each="util : ${onlineUtilsList}"><a th:href="@{http://onlineutils.sunyuchao.com__${util.url}__(bindId=${util.id})}" th:text="${util.title}"> </a><span class="timeago" th:datetime="${#dates.format(util.dateInsert, 'yyyy-MM-dd HH:mm:ss')}"></span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="right-card">
+                <h3 class="square">话题分类</h3>
+                <div>
+                    <ul id="classify-card" class="flex">
+                        <li th:each="ac : ${articleClassifyList}"><a th:data-id="${ac.id}" th:text="${ac.name}" href="javascript:;">技术</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="right-card">
+                <h3 class="square">在线工具</h3>
+                <div>
+                    <ul class="notice">
+                        <li th:each="util : ${onlineUtilsList}"><a th:href="@{http://onlineutils.sunyuchao.com__${util.url}__(bindId=${util.id})}" th:text="${util.title}"> </a><span class="timeago" th:datetime="${#dates.format(util.dateInsert, 'yyyy-MM-dd HH:mm:ss')}"></span></li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="footer">
+        <p><a href="https://beian.miit.gov.cn/">Design by：暮色妖娆丶 备案号：皖ICP备19018192号-1</a></p>
+    </div>
+
+    <script src="https://www.sunyuchao.com/static/layui/layui.js"></script>
+    <script src="https://www.sunyuchao.com/static/js/reply.js"></script>
+    <script src="https://www.sunyuchao.com/static/js/jquery3.3.1.min.js"></script>
+    <!--子回复模板-->
+    <script type="text/template" id="childMsg">
+        <div class="msg-history">
+            <div class="mh-left">
+                <img class="radius" src="{avatar}" width="40" height="40">
+            </div>
+            <div class="mh-right">
+                <input type="hidden" class="userId" value="{userId}">
+                <p>
+                <span style="float: left;"><span><a class="comment" href="javascript:;">{commentUsername}</a></span> 回复  <span>
+                    <a href="javascript:;" class="commented">{commentedUsername}</a></span></span>
+                    <span style="float: right;" class="timeago" datetime="{time}"></span>
+                </p>
+                <p class="reply-content">
+                    {content}
+                </p>
+                <p class="operate">
+                    <span class="muted"> <a onclick="openChildReply(this)" href="javascript:;">回复</a></span>
+                </p>
+            </div>
+            <hr>
+        </div>
+        <div class="layui-clear"></div>
+    </script>
+    <!--1级回复模板-->
+    <script type="text/template" id="FirstMsg">
+        <li class="item">
+            <div class="item-left">
+                <img class="radius" src="{avatar}" width="50" height="50">
+            </div>
+            <div class="item-right">
+                <p>
+                    <span style="float: left;"><a href="javascript:;" class="floor">{commentUsername}</a></span>
+                    <span style="float: right;" class="timeago" datetime="{time}"></span>
+                </p>
+                <p class="reply-content">
+                    {content}
+                </p>
+                <p class="operate">
+                    <span class="muted"> <a class="show" onclick="show(this)" href="javascript:;">展开</a>(<span>0</span>)</span>
+                    <span class="muted"> <a onclick="openReply(this)" href="javascript:;">回复</a></span>
+                    <span class="muted"> <a href="#"><i class="layui-icon layui-icon-praise"></i>17</a></span>
+                    <span class="muted"> <a href="#"><i class="layui-icon layui-icon-tread"></i>17</a></span>
+                </p>
+                <div class="msg-content">
+
+                </div>
+                <div class="item-child-smbx">
+                    <input type="hidden" class="receiverUserId" value="{commentId}">
+                    回复 <span class="receiver">{commentUsernameCopy}</span>
+                    <div contenteditable="true" class="layui-textarea" placeholder=""></div>
+                    <div class="smb-r-bottom">
+                        <a onclick="loadFace(this)" href="javascript:;"><img src="/layui/images/face/1.gif"></a>
+                        <div class="face-frame"></div>
+                        <button onclick="saveMsg(this)" class="layui-btn layui-btn-normal" style="float: right;margin-right: 8px;">留言</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="layui-clear"></div>
+        </li>
+    </script>
+    <script th:inline="javascript">
+        var loginUser=[[${session.loginUser}]];
+        var loginUserId;
+        if(loginUser != null){
+            loginUserId=loginUser.id;
+        }
+    </script>
+    <script>
+
+        //图片点击
+
+        $(document).on('click','.enlargeImg,.zoomOut',function(){
+            $(this).after("<div οnclick='closeImg()' class='enlargeImg_wrapper'></div>");
+            var imgSrc = $(this).attr('src');
+            $(".enlargeImg_wrapper").css("background-image", "url(" + imgSrc + ")");
+            $('.enlargeImg_wrapper').fadeIn(200);
+        });
+        $(document).on('click','.enlargeImg_wrapper',function(){
+            $('.enlargeImg_wrapper').fadeOut(600);
+        });
+
+        //随机颜色
+        var colorArr=["#ffda79","#1E9FFF","#fab1a0","#74b9ff","#e84393","#00b894","#FFB800"];
+        $("#classify-card li").each(function () {
+            var number= Math.floor(Math.random() * (colorArr.length -1));
+            $(this).css("background-color",colorArr[number]);
+            delete colorArr[number];
+            colorArr=colorArr.filter(function (e) {
+                return e;
+            });
+        });
+
+
+        $("#classify-card li a").click(function () {
+            var id = $(this).attr("data-id");
+            document.write("<form action='/' method='post' name='form1' style='display:none'>");
+            document.write("<input type='hidden' name='page' value='"+1+"'>");
+            document.write("<input type='hidden' name='parentId' value='"+id+"'>");
+            document.write("</form>");
+            document.form1.submit();
+        });
+        /**
+         * 留言给我
+         * */
+        function msgToMe(obj) {
+            var frameObj = $(obj).parent().prev();
+            var replyEntity={};
+            replyEntity.content = $(frameObj).html().replace(/&nbsp;/ig,'');;//回复内容
+            replyEntity.commentedUserId=1;//被回复者默认是我（生产中放到后台）
+            replyEntity.level = 1;
+            replyEntity.type = 1;
+            replyEntity.userId=loginUserId;
+            replyEntity.bindId=$("input[name=id]").val();
+            var retInfo={};
+            var flag=false;
+            $.ajax({
+                url:"/userComment/saveFirstMessage",
+                type:"POST",
+                data:replyEntity,
+                async:false,
+                success:function (e) {
+                    if(e.success){
+                        retInfo=e.data;
+                        flag=true;
+                    }else{
+                        layui.layer.alert(e.message);
+                    }
+                },dataType: "json"
+            });
+            //校验
+            if(!flag){
+                return;
+            }
+            var html=$("#FirstMsg").html();
+            var arr = [];
+            arr.push(formatTemplate(retInfo, html));
+            $("#message-comment-body").prepend(arr.join(''));
+            $(frameObj).html("");//清空文本域
+            layui.timeago.render($('.timeago'));
+        }
+
+
+        /**
+         * 保存评论
+         * */
+        function saveMsg(obj,parentId){
+
+            //获取回复信息
+            var frameObj = $(obj).parent().prev();
+            var msg = $(frameObj).html().replace(/&nbsp;/ig,'');;//回复信息
+            var receiver = $(obj).parent().parent().children(".receiver");
+            var receiverUserId = $(obj).parent().parent().children(".receiverUserId");
+            var commented = $(receiver).html();
+            var commentedId = $(receiverUserId).val();
+            var replyEntity={};
+            replyEntity.userId=loginUserId;
+            replyEntity.commentedUserId=commentedId;
+            replyEntity.content=msg;
+            replyEntity.level=2;
+            replyEntity.type=1;
+            replyEntity.bindId=$("input[name=id]").val();
+            replyEntity.parentId=parentId;
+            var flag=false;
+            var retInfo={};
+            $.ajax({
+                url:"/userComment/saveChildrenMessage",
+                type:"POST",
+                data:replyEntity,
+                async:false,
+                success:function (e) {
+                    if(e.success){
+                        retInfo=e.data;
+                        flag=true;
+                    }else{
+                        layui.layer.alert(e.message);
+                    }
+                },dataType:"json"
+            });
+            //校验
+            if(!flag){
+                return;
+            }
+            var prev = $(obj).parent().parent().prev();
+            if($(prev).is(":hidden")){
+                $(prev).show();
+            }
+
+            var html = $("#childMsg").html();
+            var arr = [];
+            arr.push(formatTemplate(retInfo, html));
+            $(prev).append(arr.join(''));//追加回复信息
+            var show = $(obj).parent().parent().prev().prev().find(".show");//展开按钮
+            $(show).html("关闭");
+
+            $(frameObj).html("");//清空回复框
+            layui.timeago.render($('.timeago'));
+        }
+
+
+        layui.config({base:'https://www.sunyuchao.com/static/layui/extends/'});
+        layui.use(['element','code','layer','timeago'], function(){
+            var element = layui.element,
+                code = layui.code,
+                layer = layui.layer,
+                timeago = layui.timeago,
+                $ = layui.jquery;
+
+            /**
+             * 给表格添加样式
+             * */
+            if(!$(".article-text table").hasClass("layui-table")){
+                $(".article-text table").addClass("layui-table")
+            }
+
+            timeago.render($(".timeago"));
+
+            $("#readMore").click(function () {
+                $("#readMore").fadeOut(500);
+            });
+
+           if($(".article-text").height() < 800){
+               $("#readMore").hide();
+           }
+            layui.code({
+                title: 'code'
+            });
+
+           /**
+            * 文章点赞
+            * */
+           $("#praise").click(function () {
+                var articleId = $("input[name=id]").val();
+                $.ajax({
+                    url:"/article/praise",
+                    type:"GET",
+                    data:{"articleId":articleId},
+                    success:function (e) {
+                        if(e.success){
+                            var html = $("#praise").children("span").html();
+                            //手势换颜色
+                            var praised = $("#praise").attr("praised");
+                            if( praised == "yes"){
+                                $("#praise").css("color","#999");
+                                $("#praise").attr("praised","no");
+                                $("#praise").children("span").html(parseInt(html) - 1)
+                            }else{
+                                $("#praise").css("color","red");
+                                $("#praise").attr("praised","yes");
+                                $("#praise").children("span").html(parseInt(html)+1)
+                            }
+                        }else if(e.code == 1){
+                            $("#login").click();
+                        }
+                    },dataType:"json"
+                });
+           });
+
+        });
+
+    </script>
+
+    <!--小姑娘特效-->
+    <script src="https://eqcn.ajz.miesnfu.com/wp-content/plugins/wp-3d-pony/live2dw/lib/L2Dwidget.min.js"></script>
+    <script>
+        L2Dwidget.init({
+            "model": {
+                jsonPath: "https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json",
+                "scale": 1
+            },
+            "display": {
+                "position": "left",
+                "width": 150,
+                "height": 300,
+                "hOffset": 0,
+                "vOffset": -20
+            },
+            "mobile": {
+                "show": true,
+                "scale": 0.5
+            },
+            "react": {
+                "opacityDefault": 1,
+                "opacityOnHover": 0.2
+            }
+        });
+    </script>
+    <script src="https://www.sunyuchao.com/static/js/heart.js"></script>
+    <script src="https://www.sunyuchao.com/static/js/common.js"></script>
+    <script>
+
+        window.onload = function(){
+            //获取元素
+            var dv = document.getElementById('live2dcanvas');
+            var x = 0;var y = 0;var l = 0;var t = 0;var isDown = false;
+            //鼠标按下事件
+            dv.onmousedown = function(e) {
+                //获取x坐标和y坐标
+                x = e.clientX;
+                y = e.clientY;
+                //获取左部和顶部的偏移量
+                l = dv.offsetLeft;
+                t = dv.offsetTop;
+                //开关打开
+                isDown = true;
+                //设置样式
+                dv.style.cursor = 'move';
+            };
+            //鼠标移动
+            window.onmousemove = function(e) {
+                if (isDown == false) {
+                    return;
+                }
+                //获取x和y
+                var nx = e.clientX;
+                var ny = e.clientY;
+                //计算移动后的左偏移量和顶部的偏移量
+                var nl = nx - (x - l);
+                var nt = ny - (y - t);
+                dv.style.left = nl + 'px';
+                dv.style.top = nt + 'px';
+            };
+            //鼠标抬起事件
+            dv.onmouseup = function() {
+                //开关关闭
+                isDown = false;
+                dv.style.cursor = 'default';
+            }
+        }
+
+    </script>
+</body>
+</html>

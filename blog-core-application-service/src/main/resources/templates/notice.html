@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>孙玉超个人博客-最新公告</title>
+    <meta name="Description" content="孙玉超个人博客是一个分享、研究Java技术的自媒体博客。Java技术栈的学习之路，我和你一起行走！" />
+    <meta name="Keywords" content="个人博客,Java技术，Java学习" />
+    <link href="https://www.sunyuchao.com/static/layui/css/layui.css" rel="stylesheet">
+
+    <link href="https://www.sunyuchao.com/static/css/fontawesome4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link href="https://www.sunyuchao.com/static/css/common.css" rel="stylesheet" >
+    <script th:src="${iconfontUrl}"></script>
+
+    <style>
+        body{background-color: rgb(244,244,244)}
+        .content{margin: 0 auto;width: 62%;margin-top: 20px;}
+        .content-left{width: 70%;float: left;background-color: white;}
+        .content-left .chapter{width: 93%;margin: 0 auto;}
+        .content-left .chapter .recommend{margin-left: 15px;}
+        .content-left .chapter .recommend li{width:50%;float: left;line-height: 26px;height: 26px;list-style: square;}
+        .chapter .title{font-weight: bold;margin-top: 20px;}
+        .publish-info{margin-top: 20px;}
+        .publish-info span{color: #999;margin-left: 10px;font-size: 15px;}
+        .description{background-color: rgb(246,246,246);padding: 10px;font-size: 15px;margin-top: 15px;color: #999;}
+        .notice-content{margin-top: 20px;font-size: 15px;line-height: 24px;}
+        .next-info{line-height: 24px;font-size: 15px;}
+        .next-info p{margin: 15px 0;}
+        .separator{background-color: rgb(244,244,244);height: 20px;}
+        .content-left .square{padding: 5px;margin-bottom: 10px;position: relative;border-bottom: 1px solid #e7e7e7;
+            padding-bottom: 10px;padding-top: 12px;}
+        .content-left .square::after {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2.5px!important;
+            width: 100px;
+            background-color: #51aded;
+            content: '';
+            transition:width 2s;
+            -moz-transition:width 2s; /* Firefox 4 */
+            -webkit-transition:width 2s; /* Safari and Chrome */
+            -o-transition:width 2s; /* Opera */
+        }
+        /*鼠标悬停div修改子元素样式*/
+        .content-left > div:hover .square:first-child::after{
+            width: 400px;
+        }
+        .content-right{width: 27%;float: right;}
+        .content-right .right-card{background-color: white;padding-bottom: 10px;}
+
+        .skill-label{margin-left: 5px;}
+        .skill-label li{float: left;margin:4px 6px;}
+        .skill-label li a{font-family: Arial, Helvetica, sans-serif;}
+
+        .content-right .square{padding: 5px;margin:0 auto;margin-bottom: 10px;position: relative;border-bottom: 1px solid #e7e7e7;
+            padding-bottom: 15px;width: 90%;padding-top: 12px;color:#526163;font-weight: bold;}
+        .content-right .square::after {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2.5px!important;
+            width: 100px;
+            background-color: #51aded;
+            content: '';
+            transition:width 1s;
+            -moz-transition:width 1s; /* Firefox 4 */
+            -webkit-transition:width 1s; /* Safari and Chrome */
+            -o-transition:width 1s; /* Opera */
+        }
+        /*鼠标悬停div修改子元素样式*/
+        .content-right > div:hover .square:first-child::after{
+            width: 200px;
+        }
+
+        .new-reply li {padding-left: 20px;width: 90%;margin-top: 10px;}
+        .new-reply .item {border-bottom: 1px solid #ccc;padding-bottom: 10px;}
+        .new-reply .item .item-left{float: left;margin-right: 10px;width: 20%;}
+        .new-reply .item .item-right{float: right;width: 75%;line-height: 23px;}
+        .new-reply .item .item-right h3 a{font-size: 15px;color: #d32;font-weight: 600;}
+        .new-reply .item .item-right p{color:#777;}
+        .new-reply .item .item-right .reply-msg{overflow: hidden;text-overflow:ellipsis;}
+        .new-reply .item .item-right .reply-msg span{white-space: nowrap;}
+
+
+        /**留言评论*/
+        .save-message-box{width:100%;height: 150px;margin: 0 auto;}
+        .smb-left{width: 6%;float: left;height: inherit;}
+        .smb-right{width: 92%;float: right;height: inherit;position: relative;}
+        .smb-r-bottom{margin-top: 8px;line-height: 38px;}
+        .face-frame{width: 200px;height: 140px;background-color: #ddf;position: absolute;top: 100px;left:35px;line-height:22px;z-index: 100;padding:8px;display: none;opacity: 0.9;}
+        .face-frame:before{content: '';display: inline-block;border-top: 9px solid transparent;border-bottom: 9px solid transparent;border-right: 9px solid #ddf;position: absolute;top: 15px;left: -9px;}
+        .face-frame img:hover{background-color: #333}
+
+        .content-left .reply-all-head{font-size: 18px;font-weight: bold;}
+
+        /*回复列表*/
+        #message-comment-body .item{width:100%;margin: 0 auto;color: #333;margin-top: 10px;}
+        #message-comment-body .item-left{width: 6%;float: left;}
+        #message-comment-body .item-right{width: 88%;float: right;border: 1px solid #eee;position: relative;padding:10px;background-color: #eee;}
+        #message-comment-body .item-right:before{    content: '';display: inline-block;border-top: 9px solid transparent;border-bottom: 9px solid transparent;border-right: 9px solid #eee;position: absolute;top: 15px;left: -9px;}
+        #message-comment-body .item-right .reply-content{clear: both;padding-top: 6px;letter-spacing: 1px;}
+        #message-comment-body .item-right .operate{text-align: right;}
+        #message-comment-body .item-right .operate .muted{margin: 10px;}
+        #message-comment-body .item-right .item-child-smbx {margin-top: 10px;display: none;position:relative;}
+        #message-comment-body .item-right .item-child-smbx .layui-textarea {margin-top: 10px;}
+
+        /**回复历史*/
+        .msg-content{display: none;}
+        .msg-history{width:100%;margin: 0 auto;margin-top: 10px;}
+        .msg-history {font-size: 13px;}
+        .mh-left{width: 6%;float: left;}
+        .mh-right{width: 91%;float: right;}
+
+        /*小屏幕 1366 x 768*/
+        @media screen and (max-width: 1366px) {
+            .content{width: 88%;}
+        }
+
+        @media screen and (max-width: 980px) {
+            .new-reply .item .item-right{width:70%;}
+            .new-reply .item .item-left{width:50px;height: 50px;}
+            .smb-right{width:88%;}
+            .new-reply-time{display: none;}
+            .new-reply .item .item-left .radius{width: 50px;height: 50px;}
+            .skill-label li a{height: 25px;}
+
+        }
+    </style>
+</head>
+<body>
+<!--搜索-->
+<div th:replace="index :: search"></div>
+<!--右下角固定-->
+<div th:replace="index :: permanent"></div>
+
+<div class="top" th:fragment="top">
+    <div class="top-center">
+        <div class="top-center-l">
+            <img th:src="${logoUrl}">
+        </div>
+        <div class="top-center-c">
+            <ul class="nav">
+                <li><a href="/">首&nbsp;&nbsp;页</a></li>
+                <li><a href="/learning">爱学习</a></li>
+                <li><a href="/life">微动态</a></li>
+                <li th:replace="index :: onlineutils"></li>
+                <li><a href="/aboutme">关于我</a></li>
+                <li><a href="/message">留言板</a></li>
+            </ul>
+        </div>
+        <div th:replace="index :: top-center-r" class="top-center-r"></div>
+
+    </div>
+</div>
+
+    <div class="content">
+        <div class="content-left">
+            <input type="hidden" name="id" th:value="${notice.id}">
+            <div class="chapter">
+                <h3 class="square">
+                    <span style="float: right;font-size: 14px;">您现在的位置是：首页 > 网站公告</span>
+                    网站公告</h3>
+                <h2 class="title" th:text="${notice.title}"></h2>
+                <p class="publish-info">
+                    <img style="border-radius: 50%;" width="35" height="35" th:src="${card.avatar}">
+                    <span>孙玉超</span>
+                    <span th:text="${#dates.format(notice.dateInsert, 'yyyy-MM-dd')}"></span>
+                    <span>【网站公告】569人已围观</span>
+                </p>
+                <p class="description" th:text="${notice.description}"></p>
+                <div class="notice-content" th:text="${notice.content}"></div>
+
+                <div class="next-info">
+                    <p>上一篇 : <a th:href="@{/notice/__${notice.id-1}__}" th:text="${pre}"></a></p>
+                    <p>下一篇 : <a th:href="@{/notice/__${notice.id+1}__}" th:text="${next}"></a></p>
+                </div>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="chapter" style="padding-bottom: 20px;">
+                <h3 class="square">推荐文章</h3>
+                <ul class="recommend">
+                    <li th:each="recArticle : ${recommendArticleList}"><a th:href="@{/article/__${recArticle.id}__}" th:text="${recArticle.title}"></a></li>
+                </ul>
+                <div class="layui-clear"></div>
+            </div>
+
+            <div class="separator"></div>
+
+            <div style="width: 93%;margin: 0 auto;">
+                <h3 class="square">留言评论</h3>
+                <div th:replace="message :: messageBox"></div>
+                <h2 class="reply-all-head">所有回复</h2>
+                <div th:replace="message :: comment"></div>
+                <div th:if="${pageTotal != 0}" class="layui-btn-container" style="margin-top: 20px;">
+                    <a th:href="@{/notice/__${notice.id}__(page=${page-1})}" th:class="${page == 1 ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-left"></i></a>
+                    <a th:href="@{/notice/__${notice.id}__(page=${num})}" th:class="${num == page ? 'layui-btn layui-btn-normal':'layui-btn'}" th:each="num : ${pageNumList}" th:text="${num}"></a>
+                    <a th:href="@{/notice/__${notice.id}__(page=${page+1})}" th:class="${page == pageTotal ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="content-right">
+            <div class="right-card">
+                <h3 class="square" style="margin-bottom: 8px;">热门标签</h3>
+                <div>
+                    <ul class="skill-label" id="hot-tag-box">
+                        <li th:each="tag : ${hotTagList}"><a class="layui-btn layui-btn-sm layui-btn-radius" th:data-id="${tag.id}" th:text="${tag.name}"></a></li>
+                    </ul>
+                </div>
+                <div class="layui-clear"></div>
+            </div>
+            <div class="separator"></div>
+            <div class="right-card">
+                <h3 class="square" style="margin-bottom: 8px;">最新评论</h3>
+                <div>
+                    <ul class="new-reply">
+                        <li th:each="lucom : ${latestCommentList}">
+                            <div class="item">
+                                <div class="item-left">
+                                    <img class="radius" th:src="${lucom.avatar}" width="60" height="60">
+                                </div>
+                                <div class="item-right">
+                                    <h3><a href="#" th:text="${lucom.username}"></a></h3>
+                                    <p class="reply-msg"><span th:utext="${lucom.content}"></span></p>
+                                    <p class="new-reply-time"><span th:text="${#dates.format(lucom.dateInsert, 'yyyy年MM月dd日 HH:mm:ss')}"></span></p>
+                                </div>
+                                <div class="layui-clear"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="separator"></div>
+           <!-- <div class="right-card">
+                <h3 class="square" style="margin-bottom: 8px;">测试测试</h3>
+                <div style="height: 160px;">
+                </div>
+            </div>-->
+        </div>
+    </div>
+
+<script src="https://www.sunyuchao.com/static/layui/layui.js" ></script>
+<script src="https://www.sunyuchao.com/static/js/reply.js" ></script>
+<script src="https://www.sunyuchao.com/static/js/jquery3.3.1.min.js" ></script>
+<!--子回复模板-->
+<script type="text/template" id="childMsg">
+    <div class="msg-history">
+        <div class="mh-left">
+            <img class="radius" src="{avatar}" width="40" height="40">
+        </div>
+        <div class="mh-right">
+            <input type="hidden" class="userId" value="{userId}">
+            <p>
+                <span style="float: left;"><span><a class="comment" href="javascript:;">{commentUsername}</a></span> 回复  <span>
+                    <a href="javascript:;" class="commented">{commentedUsername}</a></span></span>
+                <span style="float: right;" class="timeago" datetime="{time}"></span>
+            </p>
+            <p class="reply-content">
+                {content}
+            </p>
+            <p class="operate">
+                <span class="muted"> <a onclick="openChildReply(this)" href="javascript:;">回复</a></span>
+            </p>
+        </div>
+        <hr>
+    </div>
+    <div class="layui-clear"></div>
+</script>
+<!--1级回复模板-->
+<script type="text/template" id="FirstMsg">
+    <li class="item">
+        <div class="item-left">
+            <img class="radius" src="{avatar}" width="50" height="50">
+        </div>
+        <div class="item-right">
+            <p>
+                <span style="float: left;"><a href="javascript:;" class="floor">{commentUsername}</a></span>
+                <span style="float: right;" class="timeago" datetime="{time}"></span>
+            </p>
+            <p class="reply-content">
+                {content}
+            </p>
+            <p class="operate">
+                <span class="muted"> <a class="show" onclick="show(this)" href="javascript:;">展开</a>(<span>0</span>)</span>
+                <span class="muted"> <a onclick="openReply(this)" href="javascript:;">回复</a></span>
+                <span class="muted"> <a href="#"><i class="layui-icon layui-icon-praise"></i>17</a></span>
+                <span class="muted"> <a href="#"><i class="layui-icon layui-icon-tread"></i>17</a></span>
+            </p>
+            <div class="msg-content">
+
+            </div>
+            <div class="item-child-smbx">
+                <input type="hidden" class="receiverUserId" value="{commentId}">
+                回复 <span class="receiver">{commentUsernameCopy}</span>
+                <div contenteditable="true" class="layui-textarea" placeholder=""></div>
+                <div class="smb-r-bottom">
+                    <a onclick="loadFace(this)" href="javascript:;"><img src="/layui/images/face/1.gif"></a>
+                    <div class="face-frame"></div>
+                    <button onclick="saveMsg(this)" class="layui-btn layui-btn-normal" style="float: right;margin-right: 8px;">留言</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="layui-clear"></div>
+    </li>
+</script>
+
+<script th:inline="javascript">
+    var loginUser=[[${session.loginUser}]];
+    var loginUserId;
+    if(loginUser != null){
+        loginUserId=loginUser.id;
+    }
+</script>
+<script>
+    /**
+     * 留言给我
+     * */
+    function msgToMe(obj) {
+        var frameObj = $(obj).parent().prev();
+        var replyEntity={};
+        replyEntity.content = $(frameObj).html().replace(/&nbsp;/ig,'');;//回复内容
+        replyEntity.commentedUserId=1;//被回复者默认是我（生产中放到后台）
+        replyEntity.level = 1;
+        replyEntity.type = 2;
+        replyEntity.userId=loginUserId;
+        replyEntity.bindId=$("input[name=id]").val();
+        if($.trim(replyEntity.content).length == 0){
+            alert("请输入内容")
+            return false;
+        }
+        var retInfo={};
+        var flag=false;
+        $.ajax({
+            url:"/userComment/saveFirstMessage",
+            type:"POST",
+            data:replyEntity,
+            async:false,
+            success:function (e) {
+                if(e.success){
+                    retInfo=e.data;
+                    flag=true;
+                }else{
+                    layui.layer.alert(e.message);
+                }
+            },dataType: "json"
+        });
+        //校验
+        if(!flag){
+            return;
+        }
+        var html=$("#FirstMsg").html();
+        var arr = [];
+        arr.push(formatTemplate(retInfo, html));
+        $("#message-comment-body").prepend(arr.join(''));
+        $(frameObj).html("");//清空文本域
+        layui.timeago.render($('.timeago'));
+    }
+
+
+
+
+    /**
+     * 保存评论
+     * */
+    function saveMsg(obj,parentId){
+
+        //获取回复信息
+        var frameObj = $(obj).parent().prev();
+        var msg = $(frameObj).html().replace(/&nbsp;/ig,'');;//回复信息
+        var receiver = $(obj).parent().parent().children(".receiver");
+        var receiverUserId = $(obj).parent().parent().children(".receiverUserId");
+        var commented = $(receiver).html();
+        var commentedId = $(receiverUserId).val();
+        var replyEntity={};
+        replyEntity.userId=loginUserId;
+        replyEntity.commentedUserId=commentedId;
+        replyEntity.content=msg;
+        replyEntity.level=2;
+        replyEntity.type=2;
+        replyEntity.bindId=$("input[name=id]").val();
+        replyEntity.parentId=parentId;
+        var flag=false;
+        var retInfo={};
+        $.ajax({
+            url:"/userComment/saveChildrenMessage",
+            type:"POST",
+            data:replyEntity,
+            async:false,
+            success:function (e) {
+                if(e.success){
+                    retInfo=e.data;
+                    flag=true;
+                }else{
+                    layui.layer.alert(e.message);
+                }
+            },dataType:"json"
+        });
+        //校验
+        if(!flag){
+            return;
+        }
+        var prev = $(obj).parent().parent().prev();
+        if($(prev).is(":hidden")){
+            $(prev).show();
+        }
+
+        var html = $("#childMsg").html();
+        var arr = [];
+        arr.push(formatTemplate(retInfo, html));
+        $(prev).append(arr.join(''));//追加回复信息
+        var show = $(obj).parent().parent().prev().prev().find(".show");//展开按钮
+        $(show).html("关闭");
+
+        $(frameObj).html("");//清空回复框
+        layui.timeago.render($('.timeago'));
+    }
+
+
+
+    //随机颜色
+    var colorArr=["#ffda79","#1E9FFF","#fab1a0","#74b9ff","#e84393","#00b894","#67ace0","#255d88","#FFB800","#ffda79","#1E9FFF","#fab1a0","#74b9ff","#e84393","#00b894","#67ace0","#255d88","#FFB800"];
+    $(".skill-label li a").each(function () {
+        var number = Math.floor(Math.random()*(colorArr.length - 1));
+        $(this).css("background-color",colorArr[ number]);
+        delete colorArr[ number];
+        colorArr=colorArr.filter(function (e) {
+            return e;
+        });
+    });
+
+    layui.config({base:'https://www.sunyuchao.com/static/layui/extends/'});
+    layui.use(['layer','element','timeago'],function () {
+        var layer=layui.layer,
+            timeago = layui.timeago,
+            element=layui.element;
+        timeago.render($('.timeago'));
+        $("#hot-tag-box li a").click(function () {
+
+            var id = $(this).attr("data-id");
+            document.write("<form action='/learning' method='post' name='form1' style='display:none'>");
+            document.write("<input type='hidden' name='page' value='"+1+"'>");
+            document.write("<input type='hidden' name='parentId' value='"+id+"'>");
+            document.write("</form>");
+            document.form1.submit();
+        });
+    });
+</script>
+<script src="https://www.sunyuchao.com/static/js/heart.js"></script>
+<script src="https://www.sunyuchao.com/static/js/common.js"></script>
+</body>
+</html>

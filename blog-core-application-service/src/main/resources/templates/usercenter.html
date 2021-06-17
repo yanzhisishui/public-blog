@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>个人中心</title>
+    <link href="../static/layui/css/layui.css" rel="stylesheet" th:href="@{/layui/css/layui.css}"/>
+    <link href="../static/css/common.css" rel="stylesheet" th:href="@{/css/common.css}"/>
+    <style>
+        body{background-color: rgb(244,244,244)}
+        /*小屏幕 1366 x 768*/
+        @media screen and (max-width: 1366px) {
+            .content{
+                width: 88%;
+            }
+
+        }
+    </style>
+</head>
+<body>
+<div th:replace="notice :: top"></div>
+
+
+
+    <script src="../static/js/heart.js" th:src="@{/js/heart.js}"></script>
+    <script src="../static/layui/layui.js" th:src="@{/layui/layui.js}"></script>
+    <script>
+        layui.use(['element','form'], function(){
+            var element = layui.element,
+                form=layui.form,
+                $ = layui.jquery;
+
+        });
+    </script>
+</body>
+</html>

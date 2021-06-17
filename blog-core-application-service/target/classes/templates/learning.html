@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>孙玉超个人博客-Java学习</title>
+    <meta name="Description" content="孙玉超个人博客是一个分享、研究Java技术的自媒体博客。Java技术栈的学习之路，我和你一起行走！" />
+    <meta name="Keywords" content="个人博客,Java技术，Java学习" />
+    <link href="https://www.sunyuchao.com/static/css/fontawesome4.7.0/css/font-awesome.css"  rel="stylesheet">
+    <link rel="stylesheet" href="https://www.sunyuchao.com/static/css/animate.css">
+    <script th:src="${iconfontUrl}"></script>
+    <link href="https://www.sunyuchao.com/static/layui/css/layui.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://www.sunyuchao.com/static/css/common.css">
+
+
+
+    <style>
+
+
+        .content{width: 62%;margin: 0 auto;margin-top: 20px;}
+        .content .content-left{float: left;width: 72%;position: relative;}
+        .content .content-left .pick li{margin: 0 10px;float: left;}
+        .content .content-left .classify-div{position: absolute;right: 30%;width: 150px;}
+        #select{position: absolute;top: 0;right: 0;padding: 5px;font-size: 15px;}
+        .content .content-left > h2{padding: 5px;border-left: 3px solid blueviolet;margin-bottom: 10px;color:#89919a;font-weight: 600;font-size: 20px;}
+
+
+        /*文章列表*/
+        .article{width: 99%;height: 215px;background-color: white;
+            margin-bottom: 10px;
+            position: relative;
+            border-left: 5px solid transparent;
+            transition: box-shadow 1s,border-left 1s;
+            -moz-transition: box-shadow 1s,border-left 1s;
+            -webkit-transition: box-shadow 1s,border-left 1s;
+            -o-transition: box-shadow 1s,border-left 1s;
+
+        }
+        .article header h3{display: inline;}
+        .article header>span{background-color: #51aded;padding: 3px 8px;color: white;font: 14px Helvetica Neue,Helvetica,PingFang SC,Tahoma,Arial,sans-serif;}
+        .article header i{margin-left: -6px;color: #51aded;}
+
+        .article:hover{
+            box-shadow: #ccc 1px 1px 4px 4px;
+            border-left: 5px solid cornflowerblue;
+        }
+        header{margin-left: 20px;padding: 20px 0 14px 0;}
+        .focus{float: left; width: 220px;margin-left: 20px;}
+
+        .note{color: #999;line-height: 24px;font-style: normal;margin-right: 20px;font-size: 14px;
+            text-overflow:ellipsis;overflow: hidden;display: -webkit-box;
+            -webkit-line-clamp: 5;
+            text-indent: 2em;
+            -webkit-box-orient: vertical;}
+        .focus-a{overflow: hidden;width: 200px;height: 123px;display: block}
+        .picture{
+            transition: transform 1s ;
+            -moz-transition: transform 1s ;
+            -webkit-transition: transform 1s;
+            -o-transition: transform 1s ;
+        }
+        .article:hover .picture{
+            transform: scale(1.1);
+        }
+        .auth-span{position: absolute;right: 0;display: block;bottom: 0;margin-bottom: 10px;}
+        .muted{ font-size: 13px;    margin-right: 20px;    color: #999;}
+        .muted a{ color: #00a67c;}
+        .muted .fa{ font-size: 1.23em;}
+
+        /**/
+        .content .content-right{float: right;width: 27%;}
+        .content-right>h2{padding: 5px;border-left: 3px solid blueviolet;margin-bottom: 10px;color: #89919a;font-size: 20px;font-weight: 600;}
+
+        .content-right .square{padding: 5px;margin:0 auto;margin-bottom: 10px;position: relative;border-bottom: 1px solid #e7e7e7;
+            padding-bottom: 15px;width: 90%;padding-top: 12px;font-weight: bold;}
+
+        .content-right .square::after {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2.5px!important;
+            width: 100px;
+            background-color: #51aded;
+            content: '';
+            transition:width 1s;
+            -moz-transition:width 1s; /* Firefox 4 */
+            -webkit-transition:width 1s; /* Safari and Chrome */
+            -o-transition:width 1s; /* Opera */
+        }
+
+        /*鼠标悬停div修改子元素样式*/
+        .content-right > div:hover .square:first-child::after{
+            width: 200px;
+        }
+        .notice{padding-bottom: 20px;}
+        .notice li{padding: 8px 15px 6px 25px;border-radius: 4px;margin-top: 8px;margin-left: 10px;position: relative;width: 80%;transition: all .5s}
+        .notice li:hover{box-shadow: 0 0 10px blue;}
+        .notice li span{float: right;margin-right: 5px;}
+        .notice li a{display: inline-block;text-overflow:ellipsis;width: 65%;overflow: hidden;white-space:nowrap;}
+        .notice li:before {
+            position: absolute;
+            content: "";
+            width: 3px;
+            height: 3px;
+            background: #000;
+            border-radius: 50%;
+            left: 10px;
+            top: 17px;
+        }
+
+        .friend{width: 100%;height: inherit;}
+        .friend li{float: left;margin:6px 3px;width: 31%;height: 20px;line-height: 20px;text-align: center; }
+        .friend li a{color:#999;}
+
+        @keyframes rotate{
+            0%{
+                transform:rotateX(0deg) rotateY(0deg);
+            }
+            100%{
+                transform:rotateX(360deg) rotateY(360deg);
+            }
+        }
+        .wrap{width: 60%;margin: 0 auto;perspective: 1000px; /* 视图距元素的距离 相当于摄像机 */}
+        .cube{width:120px;height:120px;position:relative;font-size:30px;margin: 0 auto;
+            font-weight:bold;text-align:center;line-height:160px;transform-style:preserve-3d; /* 默认flat 2D */transform:rotateX(-30deg) rotateY(-70deg);animation:rotate 20s infinite linear; /*播放时间 播放次数为循环 缓动效果为匀速 */}
+        .cube a{color:deepskyblue;}
+        .cube  div{width:100%;height:100%;border:1px solid #fff;position:absolute;background-color:#fff;opacity:.6;transition:transform 0.4s ease-in;text-align: center;}
+        .cube .out-front{transform: translateZ(60px);}
+        .cube .out-back{transform: translateZ(-60px) rotateY(180deg);}
+        .cube .out-left{transform: translateX(-60px) rotateY(-90deg);}
+        .cube .out-right{transform: translateX(60px) rotateY(90deg);}
+        .cube .out-top{transform: translateY(-60px) rotateX(90deg);}
+        .cube .out-bottom{transform: translateY(60px) rotateX(-90deg);}
+        .cube > span{display:block;width:60px;height:60px;border:1px solid black;background-color:#999;position:absolute;top:30px;left:30px;}
+        .cube .in-front{transform: translateZ(30px);}
+        .cube .in-back{transform: translateZ(-30px) rotateY(180deg);}
+        .cube .in-left{transform: translateX(-30px) rotateY(-90deg);}
+        .cube .in-right{transform: translateX(30px) rotateY(90deg);}
+        .cube .in-top{transform: translateY(-30px) rotateX(90deg);}
+        .cube .in-bottom{transform: translateY(30px) rotateX(-90deg);}
+        .wrap:hover .out-front{transform: translateZ(120px);}
+        .wrap:hover .out-back{transform: translateZ(-120px) rotateY(180deg);}
+        .wrap:hover .out-left{transform: translateX(-120px) rotateY(-90deg);}
+        .wrap:hover .out-right{transform: translateX(120px) rotateY(90deg);}
+        .wrap:hover .out-top{transform: translateY(-120px) rotateX(90deg);}
+        .wrap:hover .out-bottom{transform: translateY(120px) rotateX(-90deg);}
+
+
+        .new-reply li {padding-left: 20px;width: 90%;margin-top: 10px;}
+        .new-reply .item {border-bottom: 1px solid #ccc;padding-bottom: 10px;}
+        .new-reply .item .item-left{float: left;margin-right: 10px;width: 20%;}
+        .new-reply .item .item-right{float: right;width: 75%;line-height: 23px;}
+        .new-reply .item .item-right h3 a{font-size: 15px;color: #d32;font-weight: 600;}
+        .new-reply .item .item-right p{color:#777;}
+        .new-reply .item .item-right .reply-msg{overflow: hidden;text-overflow:ellipsis;}
+        .new-reply .item .item-right .reply-msg span{white-space: nowrap;}
+
+
+        .content .motto{padding: 5px;margin:0 auto;margin-bottom: 20px;position: relative;border-bottom: 1px solid #ccc;
+            color:#526163;font-weight: bold;font-size: 15px;overflow: hidden;padding-bottom: 10px;}
+        .content .motto::after {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2.5px!important;
+            width: 100px;
+            background-color: #51aded;
+            content: '';
+            transition:width 2s;
+            -moz-transition:width 2s; /* Firefox 4 */
+            -webkit-transition:width 2s; /* Safari and Chrome */
+            -o-transition:width 2s; /* Opera */
+        }
+        .content:hover .motto:first-child::after{
+            width: 600px;
+        }
+
+        #selectCondition{width: 99.6%;background-color: white;
+            position: relative;height: 350px;padding: 0 10px;
+            box-sizing: border-box;margin-bottom: 10px;display: none;}
+
+        #selectCondition .first-level-box,#selectCondition .child-level-box{float: left;}
+        #selectCondition .first-level-box{margin-left: 16px;}
+        #selectCondition .item{margin-top: 10px;}
+        #selectCondition .child-level ul li{float: left;margin: 5px;}
+        #selectCondition .first-level{width: 100px;}
+        #selectCondition .child-level{float: left;margin-top: 5px;height: 300px;width: 180px;margin-left: 20px;}
+
+        #selectCondition .adapter-no-child-normal{width: 85px;padding-right: 25px;}
+        /*让英文字体好看,去掉微软雅黑*/
+        #selectCondition button{font-family: Arial, Helvetica, sans-serif;}
+        #title-search {padding-top: 10px;}
+        #title-search .active{color: red;}
+        #title-search a{margin-left: 20px;}
+        .classify-active{background-color: red;}
+
+        .content-right .right-card{margin-top: 20px;background-color: white;}
+
+        /*小屏幕 1366 x 768*/
+        @media screen and (max-width: 1366px) {
+            .content {
+                width: 88%;
+            }
+
+        }
+
+        /*手机小屏幕*/
+        @media screen and (max-width: 980px) {
+            .syc,.content{width: 95%;}
+            .notice li a{width:55%;}
+            .new-reply .item .item-right{width:70%;}
+            .new-reply .item .item-left{width:50px;height: 50px;}
+            .new-reply .item .item-left .radius{width: 50px;height: 50px;}
+            #title-search input{width: 130px;}
+            #title-search button{width: 60px;}
+            #title-search a{font-size: 12px;}
+            .content-right .right-card{max-height: 240px;overflow-y: hidden;}
+            .new-reply-time{display: none;}
+            .friend li{width: 45%;}
+        }
+
+    </style>
+</head>
+<body>
+
+<!--搜索-->
+<div th:replace="index :: search"></div>
+<!--右下角固定-->
+<div th:replace="index :: permanent"></div>
+<div class="top">
+    <div class="top-center">
+        <div class="top-center-l">
+            <img  th:src="${logoUrl}">
+        </div>
+        <div class="top-center-c">
+            <ul class="nav">
+                <li><a href="/">首&nbsp;&nbsp;页</a></li>
+                <li class="nav-this"><a href="#">爱学习</a></li>
+                <li><a href="/life">微动态</a></li>
+                <li th:replace="index :: onlineutils"></li>
+                <li><a href="/aboutme">关于我</a></li>
+                <li><a href="/message">留言板</a></li>
+            </ul>
+        </div>
+        <div th:replace="index :: top-center-r" class="top-center-r"></div>
+
+    </div>
+</div>
+
+<div class="content">
+    <h1 class="motto">
+        <span class="f-right">一叶扁舟随风而去，心若定水亦静 —— 修仙缘</span>
+    </h1>
+    <div class="content-left">
+        <h2>学习<span style="color: red;">推荐</span></h2> <a href="javascript:;" id="select">筛选<i class="layui-icon layui-icon-add-1"></i></a>
+        <div id="selectCondition">
+            <div>
+                <div id="title-search">
+                    <div class="layui-input-inline">
+                        <a th:class="${field == '' ? 'active' : ''}"  onclick="" href="javascript:;">默认</a>
+                        <a th:class="${field == 'dateInsert' ? 'active' : ''}" field="dateInsert" sort="desc" onclick="" href="javascript:;">发布时间&nbsp;
+                            <i th:if="${field != 'dateInsert'}" class="fa fa-arrow-down"></i>
+                            <i th:if="${field == 'dateInsert'}" th:class="${sort == 'asc' ? 'fa fa-arrow-up' : 'fa fa-arrow-down'}" class="fa fa-arrow-down"></i>
+                        </a>
+                        <a th:class="${field == 'browser' ? 'active' : ''}" field="browser" sort="desc" onclick="" href="javascript:;">浏览数&nbsp;
+                            <i th:if="${field != 'browser'}" class="fa fa-arrow-down"></i>
+                            <i th:if="${field == 'browser'}" th:class="${sort == 'asc' ? 'fa fa-arrow-up' : 'fa fa-arrow-down'}" class="fa fa-arrow-down"></i>
+                        </a>
+                        <a th:class="${field == 'praise' ? 'active' : ''}" field="praise" sort="desc" onclick="" href="javascript:;">点赞数&nbsp;
+                            <i th:if="${field != 'praise'}" class="fa fa-arrow-down"></i>
+                            <i th:if="${field == 'praise'}" th:class="${sort == 'asc' ? 'fa fa-arrow-up' : 'fa fa-arrow-down'}" class="fa fa-arrow-down"></i>
+                        </a>
+                        <a th:class="${field == 'commentCount' ? 'active' : ''}" field="commentCount" sort="desc" onclick="" href="javascript:;">评论数&nbsp;
+                            <i th:if="${field != 'commentCount'}" class="fa fa-arrow-down"></i>
+                            <i th:if="${field == 'commentCount'}" th:class="${sort == 'asc' ? 'fa fa-arrow-up' : 'fa fa-arrow-down'}" class="fa fa-arrow-down"></i>
+                        </a>
+                    </div>
+                    <div class="layui-input-inline" style="margin-left: 20px;">
+                        <input th:value="${keyword}" type="text" id="keyword" placeholder="请输入关键词搜索" autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline">
+                        <button id="search" class="layui-btn layui-btn-normal"><i class="layui-icon layui-icon-search"></i></button>
+                    </div>
+
+                </div>
+            </div>
+            <div id="classify-box">
+                <div class="first-level-box">
+                    <div class="first-level">
+                        <div th:each="ac : ${queryClassifyList}" class="item">
+                            <button
+                                    th:data-children-count = "${ac.directChildrenCount}"
+                                    th:data-level="${ac.level}"
+                                    th:data-id="${ac.id}"
+                                    th:onclick="showChildren(this,[[${ac.id}]],[[${ac.directChildrenCount}]]);"
+                                    th:class="${ac.directChildrenCount == 0 ?
+                                    'layui-btn layui-btn-normal adapter-no-child-normal' :'layui-btn layui-btn-normal'}">[[${ac.name}]]
+                                <i th:if="${ac.directChildrenCount != 0}" class="layui-icon layui-icon-triangle-d" style="font-size: 15px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="child-level-box"></div>
+            </div>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(articleList)}" th:each="article : ${articleList}" class="article">
+            <header>
+                <span th:text="${article.classify.name}"></span><i class="layui-icon layui-icon-triangle-r"></i>
+                <h3><a th:text="${article.title}" th:href="@{/article/__${article.id}__}"></a></h3>
+            </header>
+            <div class="focus">
+                <a th:href="@{/article/__${article.id}__}" class="focus-a"><img class="picture" th:src="${article.imageUrl}" height="120" width="240"></a>
+            </div>
+            <div class="note" th:text="${article.description}"></div>
+            <p class="auth-span">
+                <span class="muted"><i class="fa fa-user"></i> <a href="javascript:;">孙玉超</a></span>
+                <span class="muted"><i class="fa fa-clock-o"></i> <a href="javascript:;" th:text="${#dates.format(article.dateInsert, 'yyyy-MM-dd')}"></a></span>
+                <span class="muted"><i class="fa fa-eye"></i> <a th:text="${article.browser}"></a>浏览</span>
+                <span class="muted"><i class="fa fa-comment-o"></i> <span th:text="${article.commentCount}"></span>评论</span>
+                <span class="muted"><i class="layui-icon layui-icon-praise"></i> <span th:text="${article.praise}"></span> 赞</span>
+            </p>
+        </div>
+        <div th:if="${not #lists.isEmpty(articleList)}" class="layui-btn-container">
+            <a href="javascript:;" th:onclick="'flipPage(this,'+${page-1}+')'" th:class="${page == 1 ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-left"></i></a>
+            <a href="javascript:;" th:onclick="'flipPage(this,'+${num}+')' "  th:class="${num == page ? 'layui-btn layui-btn-normal pageShow':'layui-btn pageShow'}" th:each="num : ${pageNumList}" th:text="${num}"></a>
+            <a href="javascript:;" th:onclick="'flipPage(this,'+${page+1}+')'" th:class="${page == pageTotal ? 'layui-btn layui-btn-disabled':'layui-btn'}"> <i class="layui-icon layui-icon-right"></i></a>
+        </div>
+        <div th:if="${#lists.isEmpty(articleList)}">
+            <div th:replace="index :: blank"></div>
+        </div>
+    </div>
+    <div class="content-right">
+        <h2 class="animated lightSpeedIn">技术<span style="color: red;">专栏</span></h2>
+        <div style="height: 150px;margin-top: 30px;">
+            <div class="wrap">
+                <div class="cube">
+                    <a th:each="map : ${zhuanlanList}" th:onclick="classifyQuery([[${map.value.id}]]);" href="javascript:;">
+                        <div  th:class="${map.key}" th:text="${map.value.name}"></div>
+                    </a>
+                    <span class="in-front"></span>
+                    <span class="in-back"></span>
+                    <span class="in-left"></span>
+                    <span class="in-right"></span>
+                    <span class="in-top"></span>
+                    <span class="in-bottom"></span>
+                </div>
+            </div>
+        </div>
+        <div class="right-card">
+            <h3 class="square">最新文章</h3>
+            <div>
+                <ul class="notice">
+                    <li th:each="latest : ${articleTitleList}"><a th:href="@{/article/__${latest.id}__}" th:text="${latest.title}"></a><span th:text="${#dates.format(latest.dateInsert, 'yyyy-MM-dd')}"></span></li>
+                </ul>
+            </div>
+
+        </div>
+        <div class="right-card">
+            <h3 class="square">在线工具</h3>
+            <div>
+                <ul class="notice">
+                    <li th:each="util : ${onlineUtilsList}"><a th:href="@{http://onlineutils.sunyuchao.com__${util.url}__(bindId=${util.id})}" th:text="${util.title}"> </a><span th:text="${#dates.format(util.dateInsert, 'yyyy-MM-dd')}"></span></li>
+                </ul>
+            </div>
+
+        </div>
+        <div style="background-color: white;padding-bottom: 10px;margin-top: 20px;">
+            <h3 class="square">最新评论</h3>
+            <div>
+                <ul class="new-reply">
+                    <li th:each="lucom : ${latestCommentList}">
+                        <div class="item">
+                            <div class="item-left">
+                                <img class="radius" th:src="${lucom.avatar}" width="60" height="60">
+                            </div>
+                            <div class="item-right">
+                                <h3><a href="#" th:text="${lucom.username}"></a></h3>
+                                <p class="reply-msg"><span th:utext="${lucom.content}"></span></p>
+                                <p class="new-reply-time"><span th:text="${#dates.format(lucom.dateInsert, 'yyyy年MM月dd日 HH:mm:ss')}"></span></p>
+                            </div>
+                            <div class="layui-clear"></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+        <div style="margin-top: 20px;background-color: white;padding-bottom: 30px;">
+            <h3 class="square">友情链接</h3>
+            <div>
+                <ul class="friend">
+                    <li th:each="link : ${friendLinkList}"><a target="_blank" th:href="${link.url}" th:text="${link.title}">小鱼儿网</a></li>
+                </ul>
+                <div class="layui-clear"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p><a href="https://beian.miit.gov.cn/">Design by：暮色妖娆丶 备案号：皖ICP备19018192号-1</a></p>
+</div>
+
+
+
+<script src="https://www.sunyuchao.com/static/layui/layui.js"></script>
+<script src="https://www.sunyuchao.com/static/js/jquery3.3.1.min.js"></script>
+<script th:inline="javascript">
+    var classifyId=[[${classifyId}]];
+    var field=[[${field}]];
+    var keyword=[[${keyword}]];
+    if((field != null && field != "") || (classifyId != null && classifyId != "") || (keyword != null && keyword != "")){
+        $("#selectCondition").css("display","block");
+        $("#select i").removeClass("layui-icon-add-1");
+        $("#select i ").addClass(" layui-icon-close");
+        $('html,body').animate({ scrollTop: $("#selectCondition").offset().top - 50 }, 0)
+    }
+    if(classifyId != null && classifyId != ""){ //用户选了分类
+        //先拿到当前分类的层级树
+        $.ajax({
+            url:"/article/classify/selectIdTree",
+            type:"GET",
+            data:{"id":classifyId},
+            success:function (e) {
+                var arr = e.split(",");
+                for(var i =0;i< arr.length ; i++){
+                    if(i == 0){
+                        $(".first-level .item button").each(function () {
+                            if($(this).attr("data-id") == arr[i]){
+                                if($(this).attr("data-children-count") == 0){
+                                    $(this).addClass("classify-active");
+                                }
+                                else{
+                                    showChildren($(this),arr[i],1)
+                                    return;
+                                }
+                            }
+                        });
+                    }
+
+                    else{
+
+                        if(i == arr.length - 1){
+                            //选中分类标红
+                            var clb = $(".child-level-box").children(".child-level:last-child");
+                            var find = $(clb).find("button");
+                            for(var j = 0;j<find.length;j++){
+                                if($(find[j]).attr("data-id") == arr[i]){
+                                    $(find[j]).addClass("classify-active");
+                                }
+                            }
+                        }else{
+                            $(".child-level li button").each(function () {
+                                if($(this).attr("data-id") == arr[i]){
+                                    showChildren($(this),arr[i],1)
+                                    return;
+                                }
+                            });
+                        }
+                    }
+
+                }
+            },dataType:"text"
+        });
+    }
+</script>
+<script>
+
+    function classifyQuery(id) {
+        document.write("<form action='/learning' method='post' name='form1' style='display:none'>");
+        document.write("<input type='hidden' name='classifyId' value='"+id+"'>");
+        document.write("<input type='hidden' name='page' value='"+1+"'>");
+        document.write("</form>");
+        document.form1.submit();
+    }
+    //按钮搜索
+    function keywordSearch(){
+        var keyword = $("#keyword").val();
+        var sort = "";
+        var field = "";
+        $("#title-search .layui-input-inline a").each(function () {
+            if($(this).hasClass("active") && $(this).html() != "默认"){
+                sort = $(this).attr("sort")
+                field = $(this).attr("field")
+            }
+        });
+        var classifyId = "";
+        $(".child-level-box .child-level button").each(function () {
+            if($(this).hasClass("classify-active")){
+                classifyId = $(this).attr("data-id");
+            }
+        });
+        indexQuery(keyword,field,sort,classifyId,1);
+    }
+
+    //文本框回车
+    $("#keyword").keypress(function (e) {
+        if (e.which == 13) {
+            keywordSearch();
+        }
+    });
+
+    $("#search").click(function () {
+        keywordSearch();
+    });
+
+    function indexQuery(keyword,field,sort,classifyId,page){
+        document.write("<form action='/learning' method='post' name='form1' style='display:none'>");
+        document.write("<input type='hidden' name='field' value='"+field+"'>");
+        document.write("<input type='hidden' name='sort' value='"+sort+"'>");
+        document.write("<input type='hidden' name='keyword' value='"+keyword+"'>");
+        document.write("<input type='hidden' name='classifyId' value='"+classifyId+"'>");
+        document.write("<input type='hidden' name='page' value='"+page+"'>");
+        document.write("</form>");
+        document.form1.submit();
+    }
+    /**
+     *排序选项点击
+     * */
+    $("#title-search .layui-input-inline a").click(function () {
+        //如果已经激活，改变箭头
+        if($(this).hasClass("active") && $(this).html() != "默认"){
+            var attr = $(this).children("i").hasClass("fa-arrow-down")
+            if(attr){
+                $(this).attr("sort","asc")
+            }else{
+                $(this).attr("sort",attr ? "asc":"desc")
+            }
+        }
+        var sort = $(this).attr("sort")
+        var field = $(this).attr("field")
+        if($(this).html() == "默认"){
+            field  = "";
+            sort  = "";
+        }
+        var keyword = $("#keyword").val();
+        var classifyId = "" ;
+        $(".child-level-box .child-level button").each(function () {
+            if($(this).hasClass("classify-active")){
+                classifyId = $(this).attr("data-id");
+            }
+        });
+        indexQuery(keyword,field,sort,classifyId,1);
+    });
+
+    //子分类
+    function showChildren(obj,id,directChildrenCount){
+
+        if(directChildrenCount > 0){  //展开子元素
+            var attr = parseInt($(obj).attr("data-level"))-1;//这个level是child-level的索引
+            $(".child-level").each(function (i) {
+                if(i >= attr){
+                    $(this).remove();
+                }
+            })
+
+            $(obj).children("i").removeClass("layui-icon-triangle-d");
+            $(obj).children("i").addClass("layui-icon-triangle-r");
+            $.ajax({
+                url:"/article/classify/selectByParentId",
+                type:"GET",
+                async:false,
+                data:{"id":id},
+                success:function (e) {
+                    var start  ='<div class="child-level"><ul>';
+                    var end = '</ul></div>';
+                    var content = "";
+                    for(var i = 0;i<e.length;i++){
+                        var item = "";
+                        if(e[i].directChildrenCount == 0){
+                            item = '<li> <button data-id="'+e[i].id+'" onclick="showChildren(this,'+e[i].id+','+e[i].directChildrenCount+')" class="layui-btn layui-btn-sm">'+e[i].name+'</button></li>';
+                        }else{
+                            item = '<li> <button data-id="'+e[i].id+'" data-level="'+e[i].level+'" onclick="showChildren(this,'+e[i].id+','+e[i].directChildrenCount+')" class="layui-btn layui-btn-sm">'+e[i].name+'<i class="layui-icon layui-icon-triangle-d" style="font-size: 10px;"></i></button></li>';
+                        }
+                        content = content+item;
+                    }
+                    $(".child-level-box").append(start+content+end);
+                },dataType:"json"
+            });
+        }else{
+            if($(obj).hasClass("classify-active")){
+                return;
+            }
+            var sort="";
+            var field="";
+            $("#title-search .layui-input-inline a").each(function () {
+                if($(this).hasClass("active") && $(this).html() != "默认"){
+                    sort = $(this).attr("sort")
+                    field = $(this).attr("field")
+                }
+            })
+            var keyword = $("#keyword").val();
+            indexQuery(keyword,field,sort,id,1);
+        }
+    }
+
+
+    function flipPage(obj,page) {
+        if($(obj).hasClass("layui-btn-disabled")){
+            return;
+        }
+        var keyword = $("#keyword").val();
+        var sort = "";
+        var field = "";
+        $("#title-search .layui-input-inline a").each(function () {
+            if($(this).hasClass("active") && $(this).html() != "默认"){
+                sort = $(this).attr("sort")
+                field = $(this).attr("field")
+            }
+        });
+        var classifyId = "";
+        $(".child-level-box .child-level button").each(function () {
+            if($(this).hasClass("classify-active")){
+                classifyId = $(this).attr("data-id");
+            }
+        });
+        indexQuery(keyword,field,sort,classifyId,page);
+    }
+
+    layui.config({base:'https://www.sunyuchao.com/static/layui/extends/'});
+    layui.use(['layer','element'],function () {
+        var layer = layui.layer,
+            element = layui.element,
+            $ = layui.jquery;
+
+        layer.tips('文章筛选在这里！', '#select', {
+            tips: [1, '#3595CC'],
+            time: 4000
+        });
+        /*点击筛选*/
+        $("#select").click(function () {
+            var child = $(this).children()[0];
+            var open="layui-icon-add-1";
+            var close="layui-icon-close";
+            if($(child).hasClass(open)){
+                $(child).removeClass(open);
+                $(child).addClass(close);
+                $("#selectCondition").slideDown();
+            }else{
+                $(child).removeClass(close);
+                $(child).addClass(open);
+                $("#selectCondition").slideUp();
+            }
+
+        });
+
+        //文章底部页数过大隐藏部分页数
+        let totalPage = $(".pageShow").length;//总页数
+        $(".pageShow").each(function (){
+            if($(this).hasClass("layui-btn-normal")){
+                let number = parseInt($(this).html());
+                if(number <= 4){
+                    //除了最后一页,大于 3/5 * totalPage 的都隐藏，倒数第二页设置为 ...
+                    $(".pageShow").each(function (index,element){
+                        if(index + 1 > totalPage * 3/5 && index + 1 < totalPage - 1){
+                            $(this).hide();
+                        } else if(index === totalPage - 2){
+                            $(this).html("...");
+                            $(this).attr('onclick',"none");
+                        }
+                    });
+                } else if (number >=5 && number <= totalPage - 4){
+                    $(".pageShow").each(function (index,element){
+                        if(index+1 <= number - 4 && index != 0 && index != 1){
+                            $(this).hide();
+                        }
+                        if(index+1 >= number + 4 && index != totalPage - 1 && index != totalPage - 2){
+                            $(this).hide();
+                        }
+                        if(index == 1 || index == totalPage - 2){
+                            $(this).html("...");
+                            $(this).attr('onclick',"none");
+                        }
+                    });
+                } else if (number > totalPage - 4){
+                    $(".pageShow").each(function (index,element){
+
+                        if(index + 1 < totalPage - 4 && index != 1 && index != 0){
+                            $(this).hide();
+                        }
+                        if(index == 1){
+                            $(this).html("...");
+                            $(this).attr('onclick',"none");
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+
+<!--网页点击爱心-->
+<script src="https://www.sunyuchao.com/static/js/heart.js"></script>
+<script src="https://www.sunyuchao.com/static/js/common.js"></script>
+<script>
+    /*鼠标滚动时候，文章列表渐渐显示*/
+    $(window).scroll(function () {
+        $('.article').each(function (obj) {
+            if ($(this).offset().top < $(window).height()) {
+
+            } else {
+                if (($(window).height() + $(document).scrollTop()) >= $(this).offset().top +20) {
+                    $(this).addClass('animated fadeInUp');
+                }
+            }
+
+        })
+
+    });
+
+</script>
+</body>
+</html>

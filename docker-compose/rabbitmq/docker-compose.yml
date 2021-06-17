@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  #服务名称
+  rabbitmq:
+    #容器名称
+    container_name: rabbitmq
+    #镜像名称
+    image: rabbitmq:management
+    #总是重启后启动
+    restart: always
+    #端口映射
+    ports:
+      - 5672:5672
+      - 15672:15672
+    #挂载
+    volumes:
+      - ./data:/var/lib/rabbitmq
+    #环境变量
+    #environment:
+     # - RABBITMQ_DEFAULT_VHOST=my_vhost
+     # - RABBITMQ_DEFAULT_USER=guest
+      #- RABBITMQ_DEFAULT_PASS=guest

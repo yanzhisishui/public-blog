@@ -1,0 +1,50 @@
+
+application:
+  domain_name:  #开发环境
+spring:
+  datasource:
+    # 配置数据源
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 使用druid连接池
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowMultiQueries=true
+    username: root
+    password: 123456
+
+  elasticsearch:
+    rest:
+      uris: http://129.204.178.49:9200
+  thymeleaf:
+    cache: false
+  #redis相关
+  redis:
+    timeout: 2000
+    host: 127.0.0.1
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  #邮箱相关
+  mail:
+    host: smtp.qq.com
+    username: 1481232419@qq.com
+    password: qnvjkxqaidynbach
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+    default-encoding: UTF-8
+
+  rabbitmq:
+    username: guest
+    password: guest
+    addresses: 129.204.178.49
+    listener:
+      simple:
+        retry:
+          max-attempts: 5 #五次之后丢掉消息
+          enabled: true

@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  redis:
+    image: redis
+    container_name: redis
+    volumes:
+      - ./data:/data
+    environment:
+      - TZ=Asia/Shanghai
+    ports:
+      - 6379:6379
+    restart: always
+

@@ -1,0 +1,27 @@
+/**留言评论*/
+.save-message-box{width:100%;height: 150px;margin: 0 auto;}
+.smb-left{width: 6%;float: left;height: inherit;}
+.smb-right{width: 92%;float: right;height: inherit;position: relative;}
+.smb-r-bottom{margin-top: 8px;line-height: 38px;}
+.face-frame{width: 200px;height: 140px;background-color: #ddf;position: absolute;top: 100px;left:35px;line-height:22px;z-index: 100;padding:8px;display: none;opacity: 0.9;}
+.face-frame:before{content: '';display: inline-block;border-top: 9px solid transparent;border-bottom: 9px solid transparent;border-right: 9px solid #ddf;position: absolute;top: 15px;left: -9px;}
+.face-frame img:hover{background-color: #333}
+
+
+/*回复列表*/
+.item{width:100%;margin: 0 auto;color: #333;margin-top: 10px;}
+.item-left{width: 6%;float: left;}
+.item-right{width: 88%;float: right;border: 1px solid #eee;position: relative;padding:10px;background-color: #eee;}
+.item-right:before{    content: '';display: inline-block;border-top: 9px solid transparent;border-bottom: 9px solid transparent;border-right: 9px solid #eee;position: absolute;top: 15px;left: -9px;}
+.item-right .reply-content{clear: both;padding-top: 6px;letter-spacing: 1px;}
+.item-right .operate{text-align: right;}
+.item-right .operate .muted{margin: 10px;}
+.item-right .item-child-smbx {margin-top: 10px;display: none;position:relative;}
+.item-right .item-child-smbx .layui-textarea {margin-top: 10px;}
+
+/**回复历史*/
+.msg-content{display: none;}
+.msg-history{width:100%;margin: 0 auto;margin-top: 10px;}
+.msg-history {font-size: 13px;}
+.mh-left{width: 6%;float: left;}
+.mh-right{width: 91%;float: right;}
