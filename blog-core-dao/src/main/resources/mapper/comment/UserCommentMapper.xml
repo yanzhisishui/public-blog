@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.syc.blog.mapper.comment.UserCommentMapper">
+
+    <select id="selectFirstLevelCommentPage" resultType="com.syc.blog.entity.comment.UserComment">
+        select t1.*,t2.nickname as username,t2.avatar ,t4.identity_type,
+        t3.nickname as commentedUserName,t3.avatar as commentedAvatar
+        FROM user_comment t1 inner join user
+        t2 on t1.user_id=t2.id INNER JOIN user t3 on t1.commented_user_id=t3.id
+        inner join user_auth t4 on t2.id=t4.user_id  where t3.id=1
+        and t1.archive = 0 and t2.archive = 0 and t3.archive = 0
+        <choose>
+            <when test="type != null ">
+                and t1.type = #{type} and t1.bind_id=#{bindId}
+            </when>
+            <otherwise>
+                and t1.type is null and t1.bind_id is null
+            </otherwise>
+        </choose>
+        and t1.level =1 order by t1.date_insert desc
+    </select>
+
+    <select id="selectSecondLevelComment" resultType="com.syc.blog.entity.comment.UserComment">
+        select t1.*,t2.nickname as username,t2.avatar ,t4.identity_type,
+        t3.nickname as commentedUserName,t3.avatar as commentedAvatar
+        FROM user_comment t1 inner join user
+        t2 on t1.user_id=t2.id INNER JOIN user t3 on t1.commented_user_id=t3.id
+        inner join user_auth t4 on t2.id=t4.user_id where t1.parent_id=#{parentId}
+        and t1.archive = 0 and t2.archive = 0 and t3.archive = 0 and t1.level =2
+        <choose>
+            <when test="type != null">
+                and t1.type = #{type} and t1.bind_id=#{bindId}
+            </when>
+            <otherwise>
+                and t1.type is null and t1.bind_id is null
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

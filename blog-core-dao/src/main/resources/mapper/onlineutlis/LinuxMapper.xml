@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.syc.blog.mapper.onlineutils.LinuxMapper">
+
+    <select id="selectByParams" resultType="com.syc.blog.entity.onlineutils.Linux">
+        select * from util_linux where 1=1
+        <if test="params.type != null and params.type != ''">
+            <choose>
+                <when test="params.type == 'express' ">
+                    <if test="params.value != null and params.value != ''">
+                        and express like CONCAT('%',#{params.value},'%')
+                    </if>
+                </when>
+                <otherwise>
+                    <if test="params.value != null and params.value != ''">
+                        and description like CONCAT('%',#{params.value},'%')
+                    </if>
+                </otherwise>
+            </choose>
+        </if>
+
+    </select>
+
+    <select id="selectTotalCountLinux" resultType="java.lang.Integer">
+        select count(*) from util_linux where 1=1
+        <if test="type != null and type != ''">
+            <choose>
+                <when test="type == 'express' ">
+                    <if test="value != null and value != ''">
+                        and express like CONCAT('%',#{value},'%')
+                    </if>
+                </when>
+                <otherwise>
+                    <if test="value != null and value != ''">
+                        and description like CONCAT('%',#{value},'%')
+                    </if>
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+</mapper>
