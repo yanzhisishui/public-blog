@@ -1,0 +1,11 @@
+# Project exclude paths
+/blog-core-dao/target/
+/blog-core-manage/target/
+/blog-core-utils/target/
+/blog-core-application-service/target/
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+*.class

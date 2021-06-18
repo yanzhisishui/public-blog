@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  zimg:
+    image: iknow0612/zimg
+    container_name: zimg
+    volumes:
+      - ./conf:/zimg/bin/conf
+      - ./log:/zimg/bin/log
+      - ./data:/zimg/bin/img
+    ports:
+      - 4869:4869
+    restart: always
+    network_mode: host
+
