@@ -19,3 +19,6 @@
 
 
 <h3>有任何问题可以来我 QQ 交流群问我，群号：741151496</h3>
+<h3>或者加我微信</h3>
+![4E84CD7A375F49D086C6D6D64BD12067](https://user-images.githubusercontent.com/44022031/122491953-72255e00-cfd4-11eb-9819-0587e23bb441.jpg)
+
