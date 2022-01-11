@@ -18,8 +18,8 @@
 ![image](https://user-images.githubusercontent.com/44022031/122400576-618ccd80-cf6b-11eb-8749-7ff9bf27aeb6.png)
 
 
-<h3>有任何问题可以来我 QQ 交流群问我，群号：741151496</h3>
-<h3>或者加我微信</h3>
+
+<h3>有任何问题可以来加我微信</h3>
 
 
 ![QQ图片20210618093025](https://user-images.githubusercontent.com/44022031/122492208-dea05d00-cfd4-11eb-9965-3659a92ccb3b.jpg)
